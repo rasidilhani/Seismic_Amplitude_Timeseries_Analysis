@@ -12,9 +12,6 @@ for (f in csv_files) {
   d <- read_csv(f, show_col_types = FALSE)
   
   # Build the timestamp in UTC first, then convert to NZ time.
-  # (Passing tz = "Pacific/Auckland" directly into as.POSIXct() here would
-  # shift every timestamp by ~12-13 hours, since the "1970-01-01" origin
-  # would itself be treated as NZ time instead of UTC.)
   utc_time <- as.POSIXct(d$unix_timestamp, origin = "1970-01-01", tz = "UTC")
   d$datetime_nz <- with_tz(utc_time, tzone = "Pacific/Auckland")
   
@@ -23,14 +20,17 @@ for (f in csv_files) {
 
 seismic_all <- bind_rows(seismic_all)
 
-# Derive year, month, and quarter all from the same NZ-local timestamp.
-# (Tagging "year" from the filename instead would cause a mismatch: NZDT is
-# UTC+13, so the last UTC readings of Dec 31 land on Jan 1 NZ time of the
-# *next* year. Those rows would then carry the old file's year but a "Jan"
-# month, which drags the Jan/Q1 facet's x-axis out to cover the whole year.)
+# Derive all time groups from the same NZ-local timestamp.
 seismic_all$year <- year(seismic_all$datetime_nz)
 seismic_all$month <- month(seismic_all$datetime_nz, label = TRUE)
 seismic_all$quarter <- paste0("Q", quarter(seismic_all$datetime_nz))
+
+# Weekly and fortnightly groups
+seismic_all$week <- paste0("Week ", isoweek(seismic_all$datetime_nz))
+seismic_all$fortnight <- paste0(
+  "Fortnight ",
+  ceiling(yday(seismic_all$datetime_nz) / 14)
+)
 
 # ---- UI ----
 
@@ -39,17 +39,38 @@ ui <- fluidPage(
   
   sidebarLayout(
     sidebarPanel(
-      selectInput("year", "Select year:", choices = sort(unique(seismic_all$year))),
+      selectInput(
+        "year",
+        "Select year:",
+        choices = sort(unique(seismic_all$year))
+      ),
       
-      selectInput("variable", "Select variable:",
-                  choices = c("Displacement average" = "displacement_avg_m",
-                              "RSAM average" = "rsam_avg")),
+      selectInput(
+        "variable",
+        "Select variable:",
+        choices = c(
+          "Displacement average" = "displacement_avg_m",
+          "RSAM average" = "rsam_avg"
+        )
+      ),
       
-      selectInput("resolution", "Temporal view:",
-                  choices = c("Daily", "Monthly", "Quarterly")),
+      selectInput(
+        "resolution",
+        "Temporal view:",
+        choices = c(
+          "Daily",
+          "Weekly",
+          "Fortnightly",
+          "Monthly",
+          "Quarterly"
+        )
+      ),
       
-      selectInput("display_type", "Display type:",
-                  choices = c("Separate panels", "Drop-down period")),
+      selectInput(
+        "display_type",
+        "Display type:",
+        choices = c("Separate panels", "Drop-down period")
+      ),
       
       uiOutput("period_ui")
     ),
@@ -70,14 +91,36 @@ server <- function(input, output) {
     seismic_all %>% filter(year == input$year)
   })
   
-  # Drop-down for picking one specific month/quarter (only shown when needed)
+  # Drop-down for picking one specific week/fortnight/month/quarter
   output$period_ui <- renderUI({
     if (input$display_type != "Drop-down period") return(NULL)
     
-    if (input$resolution == "Monthly") {
-      selectInput("period", "Select month:", choices = month.abb)
+    df <- year_data()
+    
+    if (input$resolution == "Weekly") {
+      selectInput(
+        "period",
+        "Select week:",
+        choices = unique(df$week)
+      )
+    } else if (input$resolution == "Fortnightly") {
+      selectInput(
+        "period",
+        "Select fortnight:",
+        choices = unique(df$fortnight)
+      )
+    } else if (input$resolution == "Monthly") {
+      selectInput(
+        "period",
+        "Select month:",
+        choices = month.abb
+      )
     } else if (input$resolution == "Quarterly") {
-      selectInput("period", "Select quarter:", choices = c("Q1", "Q2", "Q3", "Q4"))
+      selectInput(
+        "period",
+        "Select quarter:",
+        choices = c("Q1", "Q2", "Q3", "Q4")
+      )
     }
   })
   
@@ -86,8 +129,21 @@ server <- function(input, output) {
     df <- year_data()
     
     if (input$display_type == "Drop-down period") {
-      if (input$resolution == "Monthly")   df <- df %>% filter(month == input$period)
-      if (input$resolution == "Quarterly") df <- df %>% filter(quarter == input$period)
+      if (input$resolution == "Weekly") {
+        df <- df %>% filter(week == input$period)
+      }
+      
+      if (input$resolution == "Fortnightly") {
+        df <- df %>% filter(fortnight == input$period)
+      }
+      
+      if (input$resolution == "Monthly") {
+        df <- df %>% filter(month == input$period)
+      }
+      
+      if (input$resolution == "Quarterly") {
+        df <- df %>% filter(quarter == input$period)
+      }
     }
     
     df
@@ -99,15 +155,34 @@ server <- function(input, output) {
     p <- ggplot(df, aes(x = datetime_nz, y = .data[[input$variable]])) +
       geom_line() +
       labs(
-        title = paste(input$resolution, "view of", input$variable, "-", input$year),
+        title = paste(
+          input$resolution,
+          "view of",
+          input$variable,
+          "-",
+          input$year
+        ),
         x = "Date",
         y = input$variable
       ) +
       theme_minimal(base_size = 14)
     
     if (input$display_type == "Separate panels") {
-      if (input$resolution == "Monthly")   p <- p + facet_wrap(~ month, scales = "free_x")
-      if (input$resolution == "Quarterly") p <- p + facet_wrap(~ quarter, scales = "free_x")
+      if (input$resolution == "Weekly") {
+        p <- p + facet_wrap(~ week, scales = "free_x")
+      }
+      
+      if (input$resolution == "Fortnightly") {
+        p <- p + facet_wrap(~ fortnight, scales = "free_x")
+      }
+      
+      if (input$resolution == "Monthly") {
+        p <- p + facet_wrap(~ month, scales = "free_x")
+      }
+      
+      if (input$resolution == "Quarterly") {
+        p <- p + facet_wrap(~ quarter, scales = "free_x")
+      }
     }
     
     p
@@ -123,7 +198,11 @@ server <- function(input, output) {
     
     data.frame(
       Statistic = c("Minimum", "Maximum", "Average"),
-      Value = formatC(c(min(x), max(x), mean(x)), format = "e", digits = 4)
+      Value = formatC(
+        c(min(x), max(x), mean(x)),
+        format = "e",
+        digits = 4
+      )
     )
   })
 }

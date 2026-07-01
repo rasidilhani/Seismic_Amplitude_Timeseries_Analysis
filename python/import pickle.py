@@ -3,16 +3,16 @@ Converts seismic .p files to CSV format for all years (2011-2022).
 
 Folder structure:
   C:\\Users\\UserA1\\Documents\\GitHub\\Seismic_Amplitude_Timeseries_Analysis\data\2011\
-      2011.001\WIZ.NZ\
-          2011_001_WIZ_displacement_average.p
-          2011_001_WIZ_RSAM_average.p
-      2011.002\WIZ.NZ\
+      2007.001\WIZ.NZ\
+          2007_001_WIZ_displacement_average.p
+          2007_001_WIZ_RSAM_average.p
+      2007.002\WIZ.NZ\
           ...
 
 Output:
   C:\\Users\\UserA1\\Documents\\GitHub\\Seismic_Amplitude_Timeseries_Analysis\csv\
-      WIZ_NZ_2011.csv
-      WIZ_NZ_2012.csv
+      WIZ_NZ_2007.csv
+      WIZ_NZ_2008.csv
       ...
 
 Requirements:
@@ -29,15 +29,15 @@ from datetime import timezone
 # ============================================================
 #  SETTINGS — edit these if your paths differ
 # ============================================================
-DATA_ROOT   = Path(r"C:\Users\UserA1\Documents\GitHub\Seismic_Amplitude_Timeseries_Analysis\data")
+DATA_ROOT   = Path(r"E:\data\seismic_amplitude_timeseries_out")
 OUTPUT_DIR  = Path(r"C:\Users\UserA1\Documents\GitHub\Seismic_Amplitude_Timeseries_Analysis\csv")
 STATION     = "WIZ.NZ"
-YEARS       = list(range(2011, 2023))  # 2011 to 2022
+YEARS       = list(range(2007, 2011))  # 2007 to 2010
 TIMEZONE    = "Pacific/Auckland"   # change to "UTC" if you prefer UTC times
 # ============================================================
 
 
-def load_p_file(path: Path):
+def load_p_file(path: Path): 
     """Load a .p pickle file and return as numpy array, or None on error."""
     try:
         with open(path, "rb") as f:
