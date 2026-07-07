@@ -30,8 +30,8 @@ df_all <- read_xlsx(input_path, sheet = 1)
 df_all <- df_all %>%
   filter(
     Period_Type == "Monthly",
-    Year >= 2011,
-    Year <= 2021
+    Year >= 2007,
+    Year <= 2022
   ) %>%
   mutate(
     Period = factor(Period, levels = month.abb),
@@ -47,8 +47,8 @@ unique(df_all$Variable)
 selected_variable <- "RSAM"
 
 feature_cols <- c(
-  "H_Shannon",
-  "C_Shannon",
+  "H_Tsallis",
+  "C_Tsallis",
   "H_Fisher",
   "C_Fisher",
   "Disequilibrium",

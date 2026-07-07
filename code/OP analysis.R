@@ -10,7 +10,7 @@ D       <- 5
 z_alpha <- qnorm(0.975)
 BETA    <- 1.5
 
-years_to_use <- 2011:2022
+years_to_use <- 2007:2010
 
 # Both Shiny-app variables get run through the ordinal pattern pipeline.
 variables <- c(
@@ -174,7 +174,7 @@ ordinal_results <- bind_rows(all_results) %>%
 
 # ── Save everything as one combined, long-format workbook ─────────────────
 dir.create(here("Results"), recursive = TRUE, showWarnings = FALSE)
-out_path <- here("Results", "WIZ_OrdinalPatterns_D5_Monthly_Quarterly.xlsx")
+out_path <- here("Results", "WIZ_OrdinalPatterns_D5_Monthly_Quarterly_2007_2010.xlsx")
 
 write_xlsx(ordinal_results, out_path)
 

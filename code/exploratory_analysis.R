@@ -3,8 +3,8 @@ library(dplyr)
 library(lubridate)
 library(ggplot2)
 
-# 1. Read 2011 data
-df <- read_csv("data/WIZ_NZ_2011.csv")
+# 1. Read 2007 data
+df <- read_csv("data/WIZ_NZ_2007.csv")
 
 # 2. Create date, year, and month columns
 df <- df %>%
@@ -27,7 +27,7 @@ ggplot(df, aes(x = datetime_nz, y = rsam_avg)) +
   scale_y_log10() +
   facet_wrap(~ month, scales = "free_x", ncol = 3) +
   labs(
-    title = "Monthly RSAM time series: 2011",
+    title = "Monthly RSAM time series: 2007",
     x = "Date",
     y = "RSAM average"
   ) +
@@ -54,7 +54,7 @@ ggplot(df, aes(x = month, y = rsam_avg)) +
   geom_boxplot() +
   scale_y_log10() +
   labs(
-    title = "Monthly RSAM boxplots: 2011",
+    title = "Monthly RSAM boxplots: 2007",
     x = "Month",
     y = "RSAM average"
   ) +
@@ -65,7 +65,7 @@ ggplot(df, aes(x = rsam_avg, colour = month)) +
   geom_density() +
   scale_x_log10() +
   labs(
-    title = "Monthly RSAM density plots: 2011",
+    title = "Monthly RSAM density plots: 2007",
     x = "RSAM average",
     y = "Density"
   ) +
@@ -77,11 +77,11 @@ kruskal.test(rsam_avg ~ month, data = df)
 # ACF for one month at a time
 apr <- df %>% filter(month == "Apr")
 
-acf(apr$rsam_avg, main = "ACF: April 2011")
+acf(apr$rsam_avg, main = "ACF: April 2007")
 
 nov <- df %>% filter(month == "Nov")
 
-acf(nov$rsam_avg, main = "ACF: November 2011")
+acf(nov$rsam_avg, main = "ACF: November 2007")
 
 #ACF for all months automatically
 months_list <- levels(df$month)
@@ -91,7 +91,7 @@ for (m in months_list) {
     filter(month == m) %>%
     pull(rsam_avg)
   
-  acf(x, main = paste("ACF:", m, "2011"))
+  acf(x, main = paste("ACF:", m, "2007"))
 }
 
 #Spectral plot for all months
@@ -100,7 +100,7 @@ for (m in months_list) {
     filter(month == m) %>%
     pull(rsam_avg)
   
-  spec.pgram(x, main = paste("Spectrum:", m, "2011"))
+  spec.pgram(x, main = paste("Spectrum:", m, "2007"))
 }
 
 
@@ -141,7 +141,7 @@ glimpse(seismic_all)
 
 # 3. Yearly summary table for Displacement
 displacement_yearly_summary <- seismic_all %>%
-  filter(year >= 2011, year <= 2022) %>%
+  filter(year >= 2007, year <= 2022) %>%
   group_by(year) %>%
   summarise(
     Mean = mean(displacement_avg_m, na.rm = TRUE),
@@ -159,7 +159,7 @@ displacement_yearly_summary
 
 # 4. Yearly summary table for RSAM
 rsam_yearly_summary <- seismic_all %>%
-  filter(year >= 2011, year <= 2022) %>%
+  filter(year >= 2007, year <= 2022) %>%
   group_by(year) %>%
   summarise(
     Mean = mean(rsam_avg, na.rm = TRUE),
@@ -197,7 +197,7 @@ p_displacement_box <- ggplot(
     outlier.alpha = 0.05
   )+
   labs(
-    title = "Monthly distribution of displacement, 2011-2022",
+    title = "Monthly distribution of displacement, 2007-2022",
     x = "Month",
     y = "Average displacement"
   ) +
@@ -224,7 +224,7 @@ p_rsam_box <- ggplot(
   )+
   scale_y_log10() +
   labs(
-    title = "Monthly distribution of RSAM, 2011-2022",
+    title = "Monthly distribution of RSAM, 2007-2022",
     x = "Month",
     y = "RSAM"
   ) +
@@ -255,7 +255,7 @@ violin_plot_displacement <- ggplot(seismic_all,
   ) +
   scale_y_log10() +
   labs(
-    title = "Monthly distribution of Displacement Average, 2011-2022",
+    title = "Monthly distribution of Displacement Average, 2007-2022",
     x = "Month",
     y = "Displacement_avg"
   ) +
@@ -285,7 +285,7 @@ violin_plot_rsam <- ggplot(seismic_all,
   ) +
   scale_y_log10() +
   labs(
-    title = "Monthly distribution of RSAM Average, 2011-2022",
+    title = "Monthly distribution of RSAM Average, 2007-2022",
     x = "Month",
     y = "RSAM_avg"
   ) +
@@ -301,47 +301,97 @@ ggsave(
 )
 
 #####################################################
-# Density plots
-p_displacement_density <- ggplot(
-  seismic_all,
-  aes(x = displacement_avg_m)
-) +
-  geom_density() +
-  labs(
-    title = "Density plot of displacement, 2011-2022",
-    x = "Average displacement",
-    y = "Density"
-  ) +
-  theme_bw(base_size = 12)
+# Displacement violin+boxplot by year
 
-p_displacement_density
+year_colors <- c(
+  "2007" = "#66C2A5",
+  "2008" = "#FC8D62",
+  "2009" = "#8DA0CB",
+  "2010" = "#E78AC3",
+  "2011" = "#1B9E77",
+  "2012" = "#D95F02",
+  "2013" = "#7570B3",
+  "2014" = "#E7298A",
+  "2015" = "#66A61E",
+  "2016" = "#E6AB02",
+  "2017" = "#A6761D",
+  "2018" = "#666666",
+  "2019" = "#377EB8",
+  "2020" = "#E41A1C",
+  "2021" = "#4DAF4A",
+  "2022" = "#F781BF"
+)
+
+violin_plot_displacement_year <- ggplot(
+  seismic_all %>% filter(year >= 2007, year <= 2022),
+  aes(x = factor(year), y = displacement_avg_m, fill = factor(year))
+) +
+  geom_violin(
+    colour = "black",
+    alpha = 0.7
+  ) +
+  geom_boxplot(
+    width = 0.12,
+    outlier.shape = NA,
+    fill = "white"
+  ) +
+  scale_fill_manual(values = year_colors) +
+  scale_y_log10() +
+  labs(
+    title = "Yearly distribution of Displacement Average",
+    x = "Year",
+    y = "Displacement_avg",
+    fill = "Year"
+  ) +
+  theme_bw(base_size = 12, base_family = "serif") +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "none"
+  )
+
+violin_plot_displacement_year
 
 ggsave(
-  "figures/density_displacement_all_years.pdf",
-  p_displacement_density,
-  width = 8,
+  "figures/yearly_violin_boxplot_displacement_all_years.pdf",
+  violin_plot_displacement_year,
+  width = 10,
   height = 5
 )
 
-# RSAM
-p_rsam_density <- ggplot(
-  seismic_all,
-  aes(x = rsam_avg)
+######################################
+# RSAM violin+boxplot by year
+violin_plot_rsam_year <- ggplot(
+  seismic_all %>% filter(year >= 2007, year <= 2022),
+  aes(x = factor(year), y = rsam_avg, fill = factor(year))
 ) +
-  geom_density() +
-  scale_x_log10() +
-  labs(
-    title = "Density plot of RSAM, 2011--2022",
-    x = "RSAM",
-    y = "Density"
+  geom_violin(
+    colour = "black",
+    alpha = 0.7
   ) +
-  theme_bw(base_size = 12)
+  geom_boxplot(
+    width = 0.12,
+    outlier.shape = NA,
+    fill = "white"
+  ) +
+  scale_fill_manual(values = year_colors) +
+  scale_y_log10() +
+  labs(
+    title = "Yearly distribution of RSAM Average",
+    x = "Year",
+    y = "RSAM_avg",
+    fill = "Year"
+  ) +
+  theme_bw(base_size = 12, base_family = "serif") +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "none"
+  )
 
-p_rsam_density
+violin_plot_rsam_year
 
 ggsave(
-  "figures/density_RSAM_all_years.pdf",
-  p_rsam_density,
-  width = 8,
+  "figures/yearly_violin_boxplot_RSAM_all_years.pdf",
+  violin_plot_rsam_year,
+  width = 10,
   height = 5
 )

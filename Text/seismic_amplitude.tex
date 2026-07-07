@@ -39,20 +39,18 @@
 	\maketitle
 	
 \section{Purpose}
-The objective of this study is to investigate the temporal characteristics of volcanic seismic activity recorded at the WIZ.NZ seismic station by applying ordinal-pattern-based feature extraction for time series clustering. The analysis uses continuous seismic observations collected between 2011 and 2022 from the GeoNet volcano monitoring network. The original seismic signals were sampled at \SI{100}{\hertz} and subsequently aggregated into 10-minute intervals. Each record contains the observation day and timestamp together with two seismic variables: the average ground displacement and the average Real-time Seismic Amplitude Measurement.
+The objective of this study is to investigate the temporal characteristics of volcanic seismic activity recorded at the WIZ.NZ seismic station by applying ordinal-pattern-based feature extraction for time series clustering. The analysis uses continuous seismic observations collected between 2007 and 2022 from the GeoNet volcano monitoring network. The original seismic signals were sampled at \SI{100}{\hertz} and subsequently aggregated into 10-minute intervals. Each record contains the observation day and timestamp together with two seismic variables: the average ground displacement and the average Real-time Seismic Amplitude Measurement.
 
-Ground displacement represents the average amplitude of ground motion measured by the seismometer during each 10-minute interval and is expressed in metres (m). In contrast, RSAM (Real-time Seismic Amplitude Measurement) provides a quantitative measure of the overall seismic signal amplitude during the same interval. Unlike displacement, RSAM is a relative measure of seismic activity rather than a physical quantity with SI units. It is widely used in volcano monitoring because it effectively summarizes changes in the level of seismic activity when individual earthquakes become difficult to distinguish due to continuous volcanic tremor or high earthquake rates. However, RSAM reflects the total seismic signal regardless of its origin and may also increase because of non-volcanic sources such as wind or other environmental noise~\cite{GeoNetRSAM}.
+Ground displacement represents the average amplitude of ground motion measured by the seismometer during each 10-minute interval and is expressed in metres (\si{\metre}). In contrast, RSAM (Real-time Seismic Amplitude Measurement) provides a quantitative measure of the overall seismic signal amplitude during the same interval. Unlike displacement, RSAM is a relative measure of seismic activity rather than a physical quantity with SI units. It is widely used in volcano monitoring because it effectively summarizes changes in the level of seismic activity when individual earthquakes become difficult to distinguish due to continuous volcanic tremor or high earthquake rates. However, RSAM reflects the total seismic signal regardless of its origin and may also increase because of non-volcanic sources such as wind or other environmental noise~\cite{GeoNetRSAM}.
 
 To investigate temporal variability, the seismic records are analysed at multiple temporal scales, including monthly datasets (January to December) and quarterly datasets. Each time series is transformed into an ordinal-pattern representation, from which several information-theoretic descriptors are computed, including Shannon entropy,  R\'enyi entropy, Tsallis entropy, statistical complexity, and Fisher information. These complementary measures quantify different aspects of the temporal structure and complexity of the seismic signals, enabling comparisons of temporal behaviour across different months, quarters, and years. The resulting feature vectors are subsequently used to assess the effectiveness of ordinal-pattern-based representations for clustering seismic time series exhibiting similar temporal characteristics.
 
-%The main purpose of this work is to investigate the temporal characteristics of seismic amplitude time series recorded at the WIZ.NZ seismic station using ordinal-pattern-based features. The study considers two types of seismic measurements, displacement and Real-time Seismic Amplitude Measurement (RSAM), derived from seismometer recordings sampled at \SI{100}{\hertz} and aggregated into 10-minute intervals from the year 2011 to 2022. Time series data were analysed at different temporal scales, including monthly datasets from January to December and quarterly datasets. The analysis employs ordinal pattern representations and information-theoretic measures to characterise the temporal behaviour of the seismic signals. Features derived from Shannon entropy, R\'enyi entropy, Tsallis entropy, statistical complexity, and Fisher information provide a comprehensive description of the underlying dynamics and enable the comparison of temporal patterns across different time periods. By examining these feature representations, the study aims to identify similarities and differences in seismic activity and assess the usefulness of ordinal-pattern-based features for analyzing and clustering seismic time series.
-	
 \section{Methodology}
 \label{sec:methodology}
 
 \subsection{Data Representation}
 
-The seismic dataset consists of temporal observations recorded at the WIZ seismic station in New Zealand. Two indicators of volcanic seismic activity were analysed: the Real-time Seismic Amplitude Measurement (RSAM) and the average ground displacement. The data span the period from 2011 to 2022 and were obtained from continuous seismic monitoring records. The original seismometer recordings were sampled at \SI{100}{\hertz} and aggregated into 10-minute intervals. For the subsequent analysis, the observations were organised into monthly and quarterly time series to investigate seismic activity at different temporal scales.
+The seismic dataset consists of temporal observations recorded at the WIZ seismic station in New Zealand. Two indicators of volcanic seismic activity were analysed: the Real-time Seismic Amplitude Measurement (RSAM) and the average ground displacement. The data span the period from 2007 to 2022 and were obtained from continuous seismic monitoring records. The original seismometer recordings were sampled at \SI{100}{\hertz} and aggregated into 10-minute intervals. For the subsequent analysis, the observations were organised into monthly and quarterly time series to investigate seismic activity at different temporal scales.
 
 Each observation is associated with a timestamp, enabling the construction of long-term time series that describe the temporal evolution of volcanic seismic activity. These time series provide the basis for the exploratory statistical analysis and the subsequent ordinal-pattern-based feature extraction presented in this study.
 
@@ -99,12 +97,12 @@ The following section presents an exploratory analysis of these time series to s
 
 Prior to the ordinal pattern analysis, an exploratory statistical analysis was conducted to examine the temporal characteristics of the seismic time series. This preliminary investigation provides an understanding of the behaviour of the data and helps identify differences in temporal dynamics that may influence the information-theoretic descriptors.
 
-The analysis was performed separately for each calendar year (2011-2022), with the observations partitioned into monthly subsets to facilitate comparisons of temporal behaviour while reducing the influence of long-term inter-annual variability.
+The analysis was performed separately for each calendar year (2007-2022), with the observations partitioned into monthly subsets to facilitate comparisons of temporal behaviour while reducing the influence of long-term inter-annual variability.
 
-Tables~\ref{tab:annual_displacement_stats} and~\ref{tab:annual_rsam_stats} summarise the annual descriptive statistics of the displacement and RSAM time series for the period 2011-2022. 
-For both variables, the distributions are positively skewed, as indicated by the mean consistently exceeding the median in most years, suggesting the presence of occasional high-amplitude seismic events. The displacement measurements exhibit substantial inter-annual variability, with the highest mean and standard deviation observed in 2022, while 2016 also shows elevated variability. This is reflected in the coefficient of variation, which exceeds 30 in 2013 and 2022 and reaches approximately 40 in 2016, indicating periods of highly variable seismic displacement. 
+Tables~\ref{tab:annual_displacement_stats} and~\ref{tab:annual_rsam_stats} summarise the annual descriptive statistics of the displacement and RSAM time series for the period 2007-2022. 
+For both variables, the distributions are positively skewed, as indicated by the mean consistently exceeding the median in most years, suggesting the presence of occasional high-amplitude seismic events. The displacement measurements show considerable variation between years, indicating that the magnitude and variability of ground displacement are not constant over the study period. The highest mean and standard deviation observed in 2022, while 2016 also shows elevated variability. This is reflected in the coefficient of variation, which exceeds 30 in 2013 and 2022 and reaches approximately 40 in 2016, indicating periods of highly variable seismic displacement. 
 
-Similarly, the RSAM measurements display considerable variability across years, with coefficients of variation ranging from approximately 0.65 to 3.45. The largest relative variability occurs in 2022, followed by 2021 and 2016. In contrast, 2011, 2012, 2014, 2015, 2017, and 2018 all exhibit relatively low coefficients of variation (less than 1), indicating comparatively more stable RSAM behaviour during those years. The minimum values for all variables are close to zero except in year 2015 and 2016, while the maximum values differ by several orders of magnitude, further highlighting the intermittent nature of high-amplitude seismic activity. Overall, these descriptive statistics demonstrate that both displacement and RSAM exhibit marked temporal variability over the study period, providing a basis for the subsequent analyses of temporal patterns using time series visualisation and ordinal-pattern-based information-theoretic measures.
+Similarly, the RSAM measurements display considerable variability across years, with coefficients of variation ranging from approximately 0.43 to 3.45. The largest relative variability occurs in 2022, followed by 2021 and 2016. In contrast, 2007, 2009, 2010, 2011, 2012, 2014, 2015, 2017, and 2018 all exhibit relatively low coefficients of variation (less than 1), indicating comparatively more stable RSAM behaviour during those years. The minimum values for all variables are close to zero except in year 2015 and 2016, while the maximum values differ by several orders of magnitude, further highlighting the intermittent nature of high-amplitude seismic activity. Overall, these descriptive statistics demonstrate that both displacement and RSAM exhibit marked temporal variability over the study period, providing a basis for the subsequent analyses of temporal patterns using time series visualisation and ordinal-pattern-based information-theoretic measures.
 
 \begin{table}[htbp]
 	\centering
@@ -118,7 +116,8 @@ Similarly, the RSAM measurements display considerable variability across years, 
 			S[table-format=1.2e-1]
 			S[table-format=1.2e-2]
 			S[table-format=1.2e-1]
-			S[table-format=2.2]
+			%--S[table-format=2.2]
+			c
 		}
 		\toprule
 		Year &
@@ -129,6 +128,10 @@ Similarly, the RSAM measurements display considerable variability across years, 
 		{Maximum} &
 		{CV} \\
 		\midrule
+		2007 & 5.13e-07 & 2.7e-07 & 4.59e-06 & 1.52e-11 & 7.0e-04 & 8.95 \\
+		2008 & 6.64e-07 & 4.02e-07 & 2.61e-06 & 9.53e-12 & 2.32e-04 & 3.93 \\
+		2009 & 8.05e-07 & 3.88e-07 & 1.17e-05 & 2.01e-14 & 1.92e-03 & 14.50 \\
+		2010 & 6.56e-07 & 3.53e-07 & 5.95e-06 & 4.44e-14 & 7.65e-04 & 9.08 \\
 		2011 & 6.84e-07 & 3.78e-07 & 5.78e-06 & 3.29e-12 & 6.19e-04 & 8.44 \\
 		2012 & 5.86e-07 & 3.41e-07 & 5.38e-06 & 1.75e-08 & 9.28e-04 & 9.18 \\
 		2013 & 7.48e-07 & 3.49e-07 & 2.31e-05 & 2.33e-13 & 4.64e-03 & 30.93 \\
@@ -169,6 +172,10 @@ Similarly, the RSAM measurements display considerable variability across years, 
 		{Maximum} &
 		{CV} \\
 		\midrule
+		2007 & 6.56e-09 & 4.85e-09 & 5.99e-09 & 1.71e-19 & 6.22e-07 & 0.91 \\
+		2008 & 5.48e-09 & 3.54e-09 & 7.36e-09 & 1.01e-19 & 1.03e-06 & 1.34 \\
+		2009 & 4.94e-09 & 4.48e-09 & 2.10e-09 & 2.28e-22 & 8.66e-08 & 0.43 \\
+		2010 & 5.02e-09 & 4.15e-09 & 3.17e-09 & 4.12e-22 & 8.50e-08 & 0.63 \\
 		2011 & 6.84e-09 & 5.35e-09 & 5.62e-09 & 2.61e-21 & 2.34e-07 & 0.82 \\
 		2012 & 3.03e-08 & 2.56e-08 & 2.28e-08 & 2.00e-18 & 1.98e-07 & 0.75 \\
 		2013 & 3.56e-08 & 1.29e-08 & 4.67e-08 & 2.54e-21 & 2.46e-06 & 1.31 \\
@@ -185,25 +192,24 @@ Similarly, the RSAM measurements display considerable variability across years, 
 	\end{tabular}
 \end{table}
 
-In addition, graphical summaries, Violin plots were used to visualize the monthly distributions because they combine the summary statistics of a boxplot with a kernel density estimate, providing a more informative representation of the highly skewed seismic measurements and their variability across months.
-In addition, graphical summaries using violin plots were employed to visualise the monthly distributions of displacement and RSAM measurements. Violin plots combine the summary statistics of a boxplot with a kernel density estimate, providing a more informative representation of the highly skewed seismic measurements and their variability across months. Unlike boxplots, violin plots illustrate the shape and density of the distributions, making it easier to identify differences in spread, skewness, multimodality, and the concentration of observations. These graphical summaries provide an overview of the temporal variability of the seismic measurements and help identify similarities and differences among the monthly distributions before applying the ordinal-pattern-based feature extraction and time series clustering.
+In addition, graphical summaries using violin plots were employed to visualize the annually distributions of displacement and RSAM measurements. Unlike boxplots, violin plots illustrate the shape and density of the distributions, making it easier to identify differences in spread, skewness, multimodality, and the concentration of observations. These graphical summaries provide an overview of the temporal variability of the seismic measurements and help identify similarities and differences among the annual distributions before applying the ordinal-pattern-based feature extraction and time series clustering.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=\textwidth]{\figpath/monthly_violin_boxplot_displacement_all_years}
-	\caption{Mean monthly RSAM.}
+	\includegraphics[width=\textwidth]{\figpath/yearly_violin_boxplot_displacement_all_years}
+	\caption{Mean yearly Displacement.}
 	\label{fig:violin_boxplot_displacement}
 \end{figure}
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=\textwidth]{\figpath/monthly_violin_boxplot_RSAM_all_years}
-	\caption{Mean monthly RSAM.}
+	\includegraphics[width=\textwidth]{\figpath/yearly_violin_boxplot_RSAM_all_years}
+	\caption{Mean yearly RSAM.}
 	\label{fig:violin_boxplot_RSAM}
 \end{figure}
 
 
-Figures~\ref{fig:violin_boxplot_displacement} and~\ref{fig:violin_boxplot_RSAM} present the monthly distributions of displacement and RSAM over the study period. The violin plots show that the monthly distributions are broadly similar in their central regions but differ mainly in the lengths of their tails and the density of observations. For displacement, March, May, July, and August exhibit comparatively shorter tails, whereas April, September, October, and November display a wider range of values. In contrast, the RSAM distributions generally exhibit longer tails across most months, with March and July showing comparatively shorter tails. These monthly differences indicate temporal variability in the seismic measurements and motivate the subsequent ordinal-pattern-based feature extraction and clustering analysis.
+Figures~\ref{fig:violin_boxplot_displacement} and~\ref{fig:violin_boxplot_RSAM} present the annual distributions of displacement and RSAM over the study period. Although the central tendencies of both variables remain broadly similar across years, noticeable differences are observed in the spread, density, and tail lengths of the distributions from year to year. For displacement, the medians remain within a narrow band around $1 \times 10^{-6}$ \si{\metre} in all years, but the spread varies considerably. Most years show long tails extending over several orders of magnitude, whereas 2009, 2010, 2013, 2014, 2021 and 2022 display the longest tails, indicating the occurrence of more extreme displacement values. By contrast, years such as 2007, 2008, 2011, 2012, and 2015-2020 show comparatively shorter upper and lower tails. For RSAM, the median values are consistently near $1 \times 10^{-7}$ across all years, with relatively small differences between years. However, the ranges extend over many orders of magnitude, and the tail lengths vary notably. Years 2009, 2010, 2011, 2013, 2014, 2019, 2020, 2021, and 2022 exhibit the longest upper tails, while 2015 shows a comparatively shorter tail. These inter-annual differences in the spread and extremity of the distributions indicate substantial temporal variability in the seismic measurements and motivate the subsequent ordinal-pattern-based feature extraction and clustering analysis. 
 
 \subsubsection{Information Theoretic Quantifiers}
 

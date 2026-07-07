@@ -12,17 +12,19 @@ input_path <- here("results", "WIZ_OrdinalPatterns_D5_Monthly_Quarterly.xlsx")
 
 # ---- Read data ----
 
-df_all <- read_xlsx(input_path, sheet = 1)
+df_all <- read_xlsx(input_path, sheet = 2)
 
 df_all <- df_all %>%
   filter(
-    Period_Type == "Monthly",
-    Year >= 2011,
-    Year <= 2021
+    #Period_Type == "Monthly",
+    Period_Type == "Quarterly",
+    Year >= 2007,
+    Year <= 2022
   ) %>%
   mutate(
-    Period = factor(Period, levels = month.abb),
-    Year = factor(Year)
+    #Period = factor(Period, levels = month.abb),
+     Period = factor(Period, levels = c("Q1", "Q2", "Q3", "Q4")),
+      Year = factor(Year)
   )
 
 # ---- Theoretical HC boundary for Shannon only ----
@@ -44,19 +46,26 @@ bound_group_col <- "Side"
 
 # ---- Month colours ----
 
+#month_colors <- c(
+#  Jan = "#1B9E77",
+#  Feb = "#D95F02",
+#  Mar = "#7570B3",
+#  Apr = "#E7298A",
+#  May = "#66A61E",
+#  Jun = "#E6AB02",
+#  Jul = "#A6761D",
+#  Aug = "#666666",
+#  Sep = "#377EB8",
+#  Oct = "#E41A1C",
+#  Nov = "#4DAF4A",
+#  Dec = "#984EA3"
+#)
+
 month_colors <- c(
-  Jan = "#1B9E77",
-  Feb = "#D95F02",
-  Mar = "#7570B3",
-  Apr = "#E7298A",
-  May = "#66A61E",
-  Jun = "#E6AB02",
-  Jul = "#A6761D",
-  Aug = "#666666",
-  Sep = "#377EB8",
-  Oct = "#E41A1C",
-  Nov = "#4DAF4A",
-  Dec = "#984EA3"
+  Q1 = "red",
+  Q2 = "green",
+  Q3 = "blue",
+  Q4 = "black"
 )
 
 # ---- Common theme ----
@@ -262,8 +271,10 @@ make_year_plot <- function(df, year_value, var_label, D, show_ci = FALSE) {
 
 # ---- Output folders ----
 
-out_dir_no_ci <- here("results", "HC_Results_Yearly_By_Month_No_CI")
-out_dir_with_ci <- here("results", "HC_Results_Yearly_By_Month_With_CI")
+#out_dir_no_ci <- here("results", "HC_Results_Yearly_By_Month_No_CI")
+#out_dir_with_ci <- here("results", "HC_Results_Yearly_By_Month_With_CI")
+out_dir_no_ci <- here("results", "HC_Results_Yearly_By_Quarterly_No_CI")
+out_dir_with_ci <- here("results", "HC_Results_Yearly_By_Quarterly_With_CI")
 
 dir.create(out_dir_no_ci, recursive = TRUE, showWarnings = FALSE)
 dir.create(out_dir_with_ci, recursive = TRUE, showWarnings = FALSE)
@@ -287,7 +298,8 @@ for (v in unique(df_all$Variable)) {
     ggsave(
       filename = file.path(
         out_dir_no_ci,
-        paste0("HC_Combined_", yr, "_", safe_var, "_D", D, "_Months_No_CI.pdf")
+        #paste0("HC_Combined_", yr, "_", safe_var, "_D", D, "_Months_No_CI.pdf")
+        paste0("HC_Combined_", yr, "_", safe_var, "_D", D, "_Quarters_No_CI.pdf")
       ),
       plot = p_no_ci,
       width = 16,
@@ -307,7 +319,8 @@ for (v in unique(df_all$Variable)) {
     ggsave(
       filename = file.path(
         out_dir_with_ci,
-        paste0("HC_Combined_", yr, "_", safe_var, "_D", D, "_Months_With_CI.pdf")
+        #paste0("HC_Combined_", yr, "_", safe_var, "_D", D, "_Months_With_CI.pdf")
+        paste0("HC_Combined_", yr, "_", safe_var, "_D", D, "_Quarters_With_CI.pdf")
       ),
       plot = p_with_ci,
       width = 16,
