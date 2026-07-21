@@ -46,20 +46,20 @@ bound_group_col <- "Side"
 
 # ---- Month colours ----
 
-#month_colors <- c(
-#  Jan = "#1B9E77",
-#  Feb = "#D95F02",
-#  Mar = "#7570B3",
-#  Apr = "#E7298A",
-#  May = "#66A61E",
-#  Jun = "#E6AB02",
-#  Jul = "#A6761D",
-#  Aug = "#666666",
-#  Sep = "#377EB8",
-#  Oct = "#E41A1C",
-#  Nov = "#4DAF4A",
-#  Dec = "#984EA3"
-#)
+month_colors <- c(
+  Jan = "#1B9E77",
+  Feb = "#D95F02",
+  Mar = "#7570B3",
+  Apr = "#E7298A",
+  May = "#66A61E",
+  Jun = "#E6AB02",
+  Jul = "#A6761D",
+  Aug = "#666666",
+  Sep = "#377EB8",
+  Oct = "#E41A1C",
+  Nov = "#4DAF4A",
+  Dec = "#984EA3"
+)
 
 month_colors <- c(
   Q1 = "red",
@@ -270,11 +270,10 @@ make_year_plot <- function(df, year_value, var_label, D, show_ci = FALSE) {
 }
 
 # ---- Output folders ----
-
-#out_dir_no_ci <- here("results", "HC_Results_Yearly_By_Month_No_CI")
-#out_dir_with_ci <- here("results", "HC_Results_Yearly_By_Month_With_CI")
-out_dir_no_ci <- here("results", "HC_Results_Yearly_By_Quarterly_No_CI")
-out_dir_with_ci <- here("results", "HC_Results_Yearly_By_Quarterly_With_CI")
+out_dir_no_ci <- here("results", "HC_Results_Yearly_By_Month_No_CI")
+out_dir_with_ci <- here("results", "HC_Results_Yearly_By_Month_With_CI")
+#out_dir_no_ci <- here("results", "HC_Results_Yearly_By_Quarterly_No_CI")
+#out_dir_with_ci <- here("results", "HC_Results_Yearly_By_Quarterly_With_CI")
 
 dir.create(out_dir_no_ci, recursive = TRUE, showWarnings = FALSE)
 dir.create(out_dir_with_ci, recursive = TRUE, showWarnings = FALSE)

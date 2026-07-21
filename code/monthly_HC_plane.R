@@ -18,7 +18,7 @@ library(patchwork)
 
 # ---- Master switch ----
 
-period_mode <- "Quarterly"   # change to "Monthly" to switch
+period_mode <- "Monthly"   # change to "Monthly" to switch
 
 # ---- Parameters ----
 
@@ -59,7 +59,7 @@ df_all <- df_all %>%
   filter(
     Period_Type == period_mode,
     Year >= 2007,
-    Year <= 2022
+    Year <= 2021
   ) %>%
   mutate(
     Period = factor(Period, levels = period_levels),
@@ -100,8 +100,8 @@ year_colors <- c(
   "2018" = "#666666",
   "2019" = "#377EB8",
   "2020" = "#E41A1C",
-  "2021" = "#4DAF4A",
-  "2022" = "#F781BF"
+  "2021" = "#4DAF4A"
+  #"2022" = "#F781BF"
 )
 
 # ---- Common theme ----
@@ -332,7 +332,7 @@ for (v in unique(df_all$Variable)) {
     ggsave(
       filename = file.path(
         out_dir_no_ci,
-        paste0("HC_Combined_", pv, "_", safe_var, "_D", D, "_Years_2007_2022_No_CI.pdf")
+        paste0("HC_Combined_", pv, "_", safe_var, "_D", D, "_Years_2007_2021_No_CI.pdf")
       ),
       plot = p_no_ci,
       width = 16,
@@ -352,7 +352,7 @@ for (v in unique(df_all$Variable)) {
     ggsave(
       filename = file.path(
         out_dir_with_ci,
-        paste0("HC_Combined_", pv, "_", safe_var, "_D", D, "_Years_2007_2022_With_CI.pdf")
+        paste0("HC_Combined_", pv, "_", safe_var, "_D", D, "_Years_2007_2021_With_CI.pdf")
       ),
       plot = p_with_ci,
       width = 16,

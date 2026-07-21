@@ -4,8 +4,8 @@ Converts seismic .p files to CSV format for all years (2011-2022).
 Folder structure:
   C:\\Users\\UserA1\\Documents\\GitHub\\Seismic_Amplitude_Timeseries_Analysis\data\2011\
       2007.001\WIZ.NZ\
-          2007_001_WIZ_displacement_average.p
-          2007_001_WIZ_RSAM_average.p
+          2007_001_WIZ_displacement.p
+          2007_001_WIZ_RSAM.p
       2007.002\WIZ.NZ\
           ...
 
@@ -30,9 +30,9 @@ from datetime import timezone
 #  SETTINGS — edit these if your paths differ
 # ============================================================
 DATA_ROOT   = Path(r"E:\data\seismic_amplitude_timeseries_out")
-OUTPUT_DIR  = Path(r"C:\Users\UserA1\Documents\GitHub\Seismic_Amplitude_Timeseries_Analysis\csv")
+OUTPUT_DIR  = Path(r"C:\Users\UserA1\Documents\GitHub\Seismic_Amplitude_Timeseries_Analysis\data")
 STATION     = "WIZ.NZ"
-YEARS       = list(range(2007, 2011))  # 2007 to 2010
+YEARS       = list(range(2018, 2020))  # 2018 to 2020
 TIMEZONE    = "Pacific/Auckland"   # change to "UTC" if you prefer UTC times
 # ============================================================
 
@@ -109,8 +109,8 @@ def main():
                 continue
 
             # ── Find displacement and RSAM files ────────────────────────────
-            disp_files = list(station_path.glob("*displacement_average.p"))
-            rsam_files = list(station_path.glob("*RSAM_average.p"))
+            disp_files = list(station_path.glob("*displacement.p"))
+            rsam_files = list(station_path.glob("*RSAM.p"))
 
             if not disp_files and not rsam_files:
                 skip_count += 1
@@ -121,14 +121,14 @@ def main():
             rsam_arr = load_p_file(rsam_files[0]) if rsam_files else None
 
             # ── Convert to DataFrames ────────────────────────────────────────
-            df_disp = arr_to_df(disp_arr, "displacement_avg_m") if disp_arr is not None else None
-            df_rsam = arr_to_df(rsam_arr, "rsam_avg")           if rsam_arr is not None else None
+            df_disp = arr_to_df(disp_arr, "displacement") if disp_arr is not None else None
+            df_rsam = arr_to_df(rsam_arr, "rsam")           if rsam_arr is not None else None
 
             # ── Merge on timestamp ───────────────────────────────────────────
             if df_disp is not None and df_rsam is not None:
                 df = pd.merge(
                     df_disp,
-                    df_rsam[["unix_timestamp", "rsam_avg"]],
+                    df_rsam[["unix_timestamp", "rsam"]],
                     on="unix_timestamp", how="outer"
                 ).sort_values("unix_timestamp").reset_index(drop=True)
 
@@ -143,13 +143,13 @@ def main():
 
             elif df_disp is not None:
                 df = df_disp.copy()
-                df["rsam_avg"] = None
+                df["rsam"] = None
             else:
                 df = df_rsam.copy()
-                df["displacement_avg_m"] = None
+                df["displacement"] = None
 
             # Reorder columns
-            df = df[["unix_timestamp", "datetime_nz", "displacement_avg_m", "rsam_avg"]]
+            df = df[["unix_timestamp", "datetime_nz", "displacement", "rsam"]]
             df = df.where(pd.notna(df), other=None)
             df["day"] = day_folder.name  # Add day identifier
 
@@ -163,7 +163,7 @@ def main():
             continue
 
         combined_df = pd.concat(all_data, ignore_index=True)
-        combined_df = combined_df[["day", "unix_timestamp", "datetime_nz", "displacement_avg_m", "rsam_avg"]]
+        combined_df = combined_df[["day", "unix_timestamp", "datetime_nz", "displacement", "rsam"]]
 
         output_file = OUTPUT_DIR / f"WIZ_NZ_{year}.csv"
         combined_df.to_csv(output_file, index=False)
