@@ -64,7 +64,7 @@ Telesca et al.~\cite{Telesca2014} were among the first to demonstrate the useful
 
 Building upon this work, Rey-Devesa et al.~\cite{ReyDevesa2023} investigated whether Shannon entropy could be used to monitor explosive activity at Volc\'an de Colima, Mexico. Analysing continuous seismic records collected between 2015 and 2017, the authors observed a systematic decrease in Shannon entropy prior to major explosive eruptions. The entropy reduction occurred several days before eruption and reflected increasing regularity within the seismic signal as magma ascent became the dominant physical process. Their results demonstrated that Shannon entropy can provide useful precursor information and may complement conventional monitoring parameters by detecting subtle dynamical changes before explosive events.
 
-The applicability of Shannon entropy was subsequently extended by Rey-Devesa et al.~\cite{ReyDevesa2023JGR}, who evaluated the method across five volcanoes with contrasting eruptive styles, including Mount Etna, Mount St.~Helens, Kīlauea, Augustine Volcano, and Bezymianny. Despite the differences in volcanic behaviour, all case studies exhibited a consistent decline in Shannon entropy prior to eruption, with precursor times ranging from several hours to approximately four days. The study demonstrated that Shannon entropy provides a computationally efficient and transferable early-warning indicator that can operate directly on continuous seismic data without requiring volcano-specific physical models or extensive training datasets.
+The applicability of Shannon entropy was subsequently extended by Rey-Devesa et al.~\cite{ReyDevesa2023JGR}, who evaluated the method across five volcanoes with contrasting eruptive styles, including Mount Etna, Mount St.~Helens, Kīlauea, Augustine Volcano, and Bezymianny. Despite the differences in volcanic behavior, all case studies exhibited a consistent decline in Shannon entropy prior to eruption, with precursor times ranging from several hours to approximately four days. The study demonstrated that Shannon entropy provides a computationally efficient and transferable early-warning indicator that can operate directly on continuous seismic data without requiring volcano-specific physical models or extensive training datasets.
 
 Collectively, these studies demonstrate that information-theoretic measures provide valuable complementary information to conventional seismic monitoring by quantifying the evolving temporal structure and complexity of volcanic seismic signals. However, existing studies primarily estimate Shannon entropy and Fisher information directly from the statistical distribution of continuous seismic waveforms. In contrast, the present study employs an ordinal-pattern framework to construct probability distributions from the temporal ordering of seismic observations and subsequently computes Shannon, R\'enyi, and Tsallis entropies together with Fisher information and statistical complexity. By integrating multiple information-theoretic measures within the ordinal pattern framework, this study aims to provide a more comprehensive characterisation of the temporal dynamics and complexity of volcanic seismic activity.
 
@@ -383,16 +383,16 @@ The analysis is based on the following thirteen ordinal-pattern features:
 
 This section presents the feature representations in the $H \times C$ plane derived from ordinal pattern analysis of the RSAM time series. Four information-theoretic feature spaces are considered: Shannon entropy and statistical complexity, Tsallis entropy and statistical complexity, R\'enyi entropy and statistical complexity, and Fisher information measure and its associated statistical complexity. These representations provide a compact visualisation of the temporal characteristics of the seismic amplitude data and allow comparisons between different observation periods.
 
-Figure~\ref{fig:dec_HC_comparison} shows the annual feature representations obtained from the RSAM time series, where each point corresponds to one year between 2007 and 2021. The four panels compare the distributions of the annual feature vectors in the different $H \times C$ planes. Although inter-annual variability is evident, analysing each month independently across years does not clearly distinguish the 2019 eruption from the surrounding years.
+%Figure~\ref{fig:dec_HC_comparison} shows the annual feature representations obtained from the RSAM time series, where each point corresponds to one year between 2007 and 2021. The four panels compare the distributions of the annual feature vectors in the different $H \times C$ planes. Although inter-annual variability is evident, analysing each month independently across years does not clearly distinguish the 2019 eruption from the surrounding years.
 
 To investigate the temporal behaviour in greater detail, the analysis was refined to the monthly level for the year 2019. Figure~\ref{fig:HxC_2019} presents the corresponding feature representations in the four $H \times C$ planes, where each point represents one month of the year. A clear separation of the December point from the remaining months is observed across the feature spaces. Since the eruption occurred during December 2019, this result indicates that the ordinal pattern based information-theoretic features successfully capture the significant change in seismic behaviour associated with the eruption.
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=\linewidth]{\figpatha/HC_Combined_Dec_RSAM_D5_Years_2007_2021_No_CI}
-	\caption{Annual feature representations in the $H \times C$ plane for the RSAM time series using Shannon, Tsallis, Rényi, and Fisher information measure based entropy complexity pairs.}
-	\label{fig:dec_HC_comparison}
-\end{figure}
+%\begin{figure}[H]
+%	\centering
+%	\includegraphics[width=\linewidth]{\figpatha/HC_Combined_Dec_RSAM_D5_Years_2007_2021_No_CI}
+%	\caption{Annual feature representations in the $H \times C$ plane for the RSAM time series using Shannon, Tsallis, Rényi, and Fisher information measure based entropy complexity pairs.}
+%	\label{fig:dec_HC_comparison}
+%\end{figure}
 
 \begin{figure}[H]
 	\centering
@@ -463,31 +463,79 @@ The week containing the Whakaari/White Island eruption (Week~57, 3-9 December 20
 
 Interestingly, two earlier periods, Week~15 (26 March-1 April 2019) and Week~39 (17-23 August 2019), are also consistently identified by all measures as exhibiting relatively low entropy and high complexity. Their locations on the entropy-complexity plane indicate that the seismic dynamics during these weeks were more structured than the surrounding periods, suggesting that significant changes in the ordinal pattern distribution were not unique to the eruption period. These intervals may therefore represent episodes of increased volcanic unrest or changes in the underlying seismic behavior that warrant further investigation.
 
-%\subsection{Time Series Clustering}
-%The time series clustering is based on the following features derived from ordinal patterns.
+\section{Cluster Analysis of Weekly Entropy-Complexity Features}
+The weekly RSAM cluster analysis is based on the following features derived from ordinal patterns.
+\begin{itemize}
+	\item $H_{\text{Shannon}}$,
+	$H_{\text{R\'enyi}}$,
+	$H_{\text{Tsallis}}$,
+	$H_{\text{Fisher}}$,
+	
+	\item $C_{\text{Shannon}}$,
+	$C_{\text{R\'enyi}}$,
+	$C_{\text{Tsallis}}$,
+	$C_{\text{Fisher}}$,
+	
+	\item Disequilibrium,
+	
+	\item $\mathrm{Var}(H_{\text{Shannon}})$,
+	$\mathrm{Var}(H_{\text{R\'enyi}})$,
+	$\mathrm{Var}(H_{\text{Tsallis}})$,
+	
+	\item $\mathrm{Var}(C_{\text{Shannon}})$.
+\end{itemize}
 
-%\begin{itemize}
-%	\item $H_{\text{Shannon}}$,
-%	$H_{\text{Rényi}}$,
-%	$H_{\text{Tsallis}}$,
-%	$H_{\text{Fisher}}$,
-	
-%	\item $C_{\text{Shannon}}$,
-%	$C_{\text{Rényi}}$,
-%	$C_{\text{Tsallis}}$,
-%	$C_{\text{Fisher}}$,
-	
-%	\item Disequilibrium,
-	
-%	\item $\mathrm{Var}(H_{\text{Shannon}})$,
-%	$\mathrm{Var}(H_{\text{Rényi}})$,
-%	$\mathrm{Var}(H_{\text{Tsallis}})$,
-	
-%	\item $\mathrm{Var}(C_{\text{Shannon}})$.
-%\end{itemize}
+% ============================================================
+% FIGURE 1 -- Correlation matrix
+% ============================================================
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\linewidth]{\figpathc/correlation_matrix_rsam_2019}
+	\caption{Pairwise Pearson correlations among the 13 standardised entropy-complexity features computed for weekly RSAM data (2019).}
+	\label{fig:corr_matrix}
+\end{figure}
 
-%\subsection{Cluster Evaluation}
+The feature correlation matrix in Figure~\ref{fig:corr_matrix} shows that Shannon entropy is negatively correlated with Shannon complexity, the Fisher information measure, and the complexity associated with the Fisher information measure. R\'enyi entropy also shows negative correlation with Shannon complexity, the Fisher information measure, and the complexity associated with the Fisher information measure. Further, it is clear from the figure that Shannon complexity is positively correlated with the Fisher information measure and the complexity associated with it. Tsallis entropy follows the same pattern as Shannon and R\'enyi entropy, exhibiting an almost perfect positive correlation with both ($r \approx 1.00$), which indicates that the three entropy measures capture essentially the same information content in the ordinal pattern distribution. This near-redundancy extends to the complexity family as well: Shannon complexity, R\'enyi complexity, and Tsallis complexity are almost perfectly correlated with one another ($r \approx 1.00$), and all three are strongly correlated with the Fisher information measure and Fisher complexity ($r = 0.93$-$0.96$). The disequilibrium follows the complexity family closely, correlating almost perfectly with Shannon and R\'enyi complexity
+($r \approx 1.00$) and strongly with the Fisher-based measures ($r = 0.93$-$0.96$), while correlating almost perfectly negatively with all three entropy measures ($r = -0.99$ to $-1.00$). By contrast, the variance-based quantities ($\mathrm{Var}(H_{Shannon})$, $\mathrm{Var}(C_{Shannon})$, $\mathrm{Var}(H_{R\acute{e}nyi})$,
+$\mathrm{Var}(H_{Tsallis})$) show comparatively weak-to-moderate associations with the entropy and complexity measures ($|r|$ in the range $0.3$-$0.7$), and their inter-correlations are themselves inconsistent: $\mathrm{Var}(H_{Shannon})$ and $\mathrm{Var}(H_{Tsallis})$ are strongly correlated ($r = 0.98$), whereas
+$\mathrm{Var}(C_{Shannon})$ and $\mathrm{Var}(H_{R\acute{e}nyi})$ are essentially uncorrelated ($r = -0.02$). Taken together, this correlation structure suggests that the entropy-based features and the complexity-based features each behave as near-redundant sets of variables, while the variance-derived quantities carry comparatively independent information and may be more useful for downstream feature selection.
 
+
+% ============================================================
+% FIGURE 2 -- PCA biplot (weeks by DBSCAN cluster + loadings)
+% ============================================================
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\linewidth]{\figpathc/pca_biplot_clusters_rsam_2019}
+	\caption{PCA biplot of weekly entropy-complexity features, with weeks coloured by DBSCAN cluster assignment (0 = noise) and the 13 feature loading vectors overlaid.}
+	\label{fig:pca_biplot}
+\end{figure}
+
+Given the strong pairwise correlations identified above, the 13 features were reduced via principal component analysis prior to clustering. The first two components account for 76.4\% and 17.1\% of total variance, respectively (93.5\% combined), so DBSCAN was applied in this reduced two-dimensional space. The loading vectors reveal a clear structure: PC1 separates the entropy measures ($H_{Shannon}$, $H_{R\acute{e}nyi}$, $H_{Tsallis}$) from the complexity and disequilibrium-related measures ($C_{Shannon}$, $C_{R\acute{e}nyi}$, $C_{Tsallis}$, $C_{Fisher}$, Fisher Information, Disequilibrium), which point in the opposite direction, while PC2 is dominated by the variance-based features ($Var\_C_{Shannon}$, $Var\_H_{Tsallis}$, $Var\_H_{Shannon}$). DBSCAN identified a single dense cluster comprising the majority of weeks, with four weeks (15, 56, 57, and 60) flagged as noise points that fall outside this cluster. Three of these align closely with the known eruption timeline: week 56 corresponds to the pre-eruption period, week 57 to the eruption itself, and week 60 to the post-eruption period, so their separation from the main cluster is consistent with the anomalous seismic activity surrounding the eruptive episode. Week 15, by contrast, has no documented event associated with it, making it a particularly interesting case: its identification as an outlier by an unsupervised method, with no corresponding entry in the known event record, suggests it may capture some unrecognised or undocumented activity at WIZ during this period, and warrants further investigation.
+
+% ============================================================
+% FIGURE 3 -- kNN distance plot
+% ============================================================
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\linewidth]{\figpathc/knn_distance_plot}
+	\caption{4-nearest-neighbour distance plot used to select the DBSCAN neighbourhood radius ($\varepsilon$).}
+	\label{fig:knn_dist}
+\end{figure}
+
+The DBSCAN neighbourhood radius ($\varepsilon = 1.80$) and minimum points parameter ($minPts = 4$, twice the number of retained principal components) were selected following standard heuristics~\cite{S.1998}. The $k$-NN distance plot (Figure~\ref{fig:knn_dist}) shows the expected gradual-to-steep transition, supporting this choice of $\varepsilon$.
+
+% ============================================================
+% FIGURE 4 -- dbscan plot
+% ============================================================
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\linewidth]{\figpathc/dbscan_clusters_rsam_2019}
+	\caption{DBSCAN plot.}
+	\label{fig:dbscan}
+\end{figure}
+
+These results are confirmed by the entropy-complexity plane presented earlier (Figure~\ref{fig:HxC_noCI2019}): the same weeks identified as noise by DBSCAN (Figure~\ref{fig:dbscan}) are clearly distinguishable there as well. The consistent results from the $H \times C$ plane and DBSCAN clustering suggest that these weeks have distinct dynamical patterns.
 
 	
 \bibliographystyle{acm}
