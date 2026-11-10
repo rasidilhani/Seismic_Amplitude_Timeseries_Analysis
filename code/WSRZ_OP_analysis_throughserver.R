@@ -50,7 +50,7 @@ library(StatOrdPattHxC)
 ## ---- CONFIG ------------------------------------------------------------
 STATION      <- "WSRZ"
 
-START_DATE   <- as.Date("2014-07-01")
+START_DATE   <- as.Date("2007-01-01")
 END_DATE     <- as.Date("2019-12-31")
 
 RSYNC_HOST   <- "illslef1@core.geo.vuw.ac.nz"

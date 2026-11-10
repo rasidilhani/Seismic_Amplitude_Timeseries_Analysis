@@ -1,0 +1,108 @@
+\begin{thebibliography}{10}
+
+\bibitem{Auker2013}
+{\sc Auker, M., Sparks, R., Siebert, L., Crosweller, H., and Ewert, J.}
+\newblock A statistical analysis of the global historical volcanic fatalities
+  record.
+\newblock {\em Journal of Applied Volcanology 2}, 2 (2013), 1--24.
+
+\bibitem{Bandt2002}
+{\sc Bandt, C., and Pompe, B.}
+\newblock Permutation entropy: A natural complexity measure for time series.
+\newblock {\em Phys. Rev. Lett. 88\/} (Apr 2002), 174102.
+
+\bibitem{Brown2015}
+{\sc Brown, S., Loughlin, S., Sparks, R., Vye-Brown, C., Barclay, J., Calder,
+  E., Cottrell, E., Jolly, G., Komorowski, J.-C., Mandeville, C., et~al.}
+\newblock Global volcanic hazard and risk.
+\newblock In {\em Global Volcanic Hazards and Risk}, S.~Loughlin, S.~Sparks,
+  S.~Brown, S.~Jenkins, and C.~Vye-Brown, Eds. Cambridge University Press,
+  Cambridge, 2015, pp.~81--172.
+
+\bibitem{Dempsey2020}
+{\sc Dempsey, D., Cronin, S., Mei, S., and Kempa-Liehr, A.}
+\newblock Automatic precursor recognition and real-time forecasting of sudden
+  explosive volcanic eruptions at whakaari, new zealand.
+\newblock {\em Nature Communications 11}, 1 (2020), 3562.
+
+\bibitem{Endo1991}
+{\sc Endo, E., and Murray, T.}
+\newblock Real-time seismic amplitude measurement ({RSAM}): A volcano
+  monitoring and prediction tool.
+\newblock {\em Bulletin of Volcanology 53}, 7 (1991), 533--545.
+
+\bibitem{Erfurt2022}
+{\sc Erfurt, P.}
+\newblock Volcano tourism and visitor safety: Still playing with fire? a
+  10-year update.
+\newblock {\em Geoheritage 14}, 2 (2022), 56.
+
+\bibitem{GNSVolcanoMonitoring}
+{\sc {GNS Science}}.
+\newblock Volcano monitoring, 2025.
+\newblock Accessed: 14 July 2026.
+
+\bibitem{lamberti2004intensive}
+{\sc Lamberti, P.~W., Martin, M.~T., Plastino, A., and Rosso, O.~A.}
+\newblock Intensive entropic non-triviality measure.
+\newblock {\em Physica A: Statistical Mechanics and its Applications 334}, 1-2
+  (2004), 119--131.
+
+\bibitem{Prata2009}
+{\sc Prata, A., and Tupper, A.}
+\newblock Aviation hazards from volcanoes: The state of the science.
+\newblock {\em Natural Hazards 51}, 2 (2009), 239--244.
+
+\bibitem{Rey2024Asymptotic}
+{\sc Rey, A., Frery, A.~C., Gambini, J., and Lucini, M.}
+\newblock Asymptotic distribution of entropies and fisher information measure
+  of ordinal patterns with applications.
+\newblock {\em Chaos, Solitons \& Fractals 188\/} (2024), 115481.
+
+\bibitem{ReyDevesa2023JGR}
+{\sc Rey-Devesa, P., Ben{\'i}tez, C., Prudencio, J., Guti{\'e}rrez, L.,
+  Cort{\'e}s-Moreno, G., Titos, M., Koulakov, I., Zuccarello, L., and
+  Ib{\'a}{\~n}ez, J.}
+\newblock Volcanic early warning using shannon entropy: Multiple cases of
+  study.
+\newblock {\em Journal of Geophysical Research: Solid Earth 128}, 6 (2023),
+  e2023JB026684.
+
+\bibitem{ReyDevesa2023}
+{\sc Rey-Devesa, P., Prudencio, J., Ben{\'i}tez, C., Bret{\'o}n, M., Plasencia,
+  I., Le{\'o}n, Z., Ortigosa, F., Guti{\'e}rrez, L., Ar{\'a}mbula-Mendoza, R.,
+  and Ib{\'a}{\~n}ez, J.}
+\newblock Tracking volcanic explosions using shannon entropy at volc{\'a}n de
+  colima.
+\newblock {\em Scientific Reports 13}, 1 (2023), 9807.
+
+\bibitem{S.1998}
+{\sc S., J., E., M., K., H.-P., and Xu, X.}
+\newblock Density-based clustering in spatial databases: The algorithm gdbscan
+  and its applications.
+\newblock {\em Data mining and knowledge discovery 2}, 2 (1998), 169--194.
+
+\bibitem{Small2001}
+{\sc Small, C., and Naumann, T.}
+\newblock The global distribution of human population and recent volcanism.
+\newblock {\em Environmental Hazards 3}, 3--4 (2001), 93--109.
+
+\bibitem{Telesca2014}
+{\sc Telesca, L., Lovallo, M., Molist, J.~M., Moreno, C.~L., and Mel{\'e}ndez,
+  R.~A.}
+\newblock Using the fisher--shannon method to characterize continuous seismic
+  signal during volcanic eruptions: Application to the 2011--2012 el hierro
+  (canary islands) eruption.
+\newblock {\em Terra Nova 26}, 6 (2014), 425--429.
+
+\bibitem{Tilling1989}
+{\sc Tilling, R.}
+\newblock Volcanic hazards and their mitigation: Progress and problems.
+\newblock {\em Reviews of Geophysics 27}, 2 (1989), 237--269.
+
+\bibitem{TopoMapNZ}
+{\sc {TopoMap NZ}}.
+\newblock Whakaari (white island) topographic map, 2026.
+\newblock Accessed: 16 July 2026.
+
+\end{thebibliography}

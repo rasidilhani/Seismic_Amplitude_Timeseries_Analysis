@@ -1,0 +1,48 @@
+This is BibTeX, Version 0.99e
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: seismic_analysis.aux
+Reallocating 'name_of_file' (item size: 1) to 6 items.
+The style file: plain.bst
+Reallocating 'name_of_file' (item size: 1) to 19 items.
+Database file #1: seismic_references.bib
+You've used 9 entries,
+            2118 wiz_defined-function locations,
+            573 strings with 5962 characters,
+and the built_in function-call counts, 3276 in all, are:
+= -- 307
+> -- 201
+< -- 0
++ -- 80
+- -- 70
+* -- 274
+:= -- 574
+add.period$ -- 27
+call.type$ -- 9
+change.case$ -- 62
+chr.to.int$ -- 0
+cite$ -- 9
+duplicate$ -- 94
+empty$ -- 223
+format.name$ -- 70
+if$ -- 644
+int.to.chr$ -- 0
+int.to.str$ -- 9
+missing$ -- 8
+newline$ -- 48
+num.names$ -- 18
+pop$ -- 51
+preamble$ -- 1
+purify$ -- 53
+quote$ -- 0
+skip$ -- 66
+stack$ -- 0
+substring$ -- 194
+swap$ -- 9
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 36
+warning$ -- 0
+while$ -- 29
+width$ -- 10
+write$ -- 100

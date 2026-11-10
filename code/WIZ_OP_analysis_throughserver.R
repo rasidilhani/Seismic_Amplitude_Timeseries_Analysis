@@ -50,7 +50,7 @@ library(StatOrdPattHxC)
 ## ---- CONFIG ------------------------------------------------------------
 STATION      <- "WIZ"
 
-START_DATE   <- as.Date("2014-07-01")
+START_DATE   <- as.Date("2007-01-01")
 END_DATE     <- as.Date("2019-12-31")
 
 RSYNC_HOST   <- "illslef1@core.geo.vuw.ac.nz"
@@ -71,7 +71,7 @@ BETA         <- 1.5    # order parameter for Renyi / Tsallis entropy
 Z_ALPHA      <- 1.96   # z-value for ~95% semi-CI
 
 WINDOW_DAYS  <- 7       # length of each weekly window (days)
-STEP_DAYS    <- 6       # advance between consecutive window starts (days)
+STEP_DAYS    <- 1       # advance between consecutive window starts (days)
 # STEP_DAYS < WINDOW_DAYS => overlapping weeks (unchanged from original)
 
 if (!dir.exists(CACHE_DIR))   dir.create(CACHE_DIR, recursive = TRUE)

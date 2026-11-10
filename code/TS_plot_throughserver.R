@@ -243,30 +243,29 @@ wsrz <- load_station("WSRZ", all_dates, CACHE_DIR)
 cat("WIZ range:  ", format(range(wiz$utc_time)),  "\n")
 cat("WSRZ range: ", format(range(wsrz$utc_time)), "\n")
 
+## Sampling interval of the RSAM data (the finest time step the plots can show)
+cat("WIZ sampling interval:  ", format(median(diff(wiz$utc_time))),  "\n")
+cat("WSRZ sampling interval: ", format(median(diff(wsrz$utc_time))), "\n")
+
 ## ---- Step 5: eruption windows to highlight and zoom into -------------------
 ##
-## Given as NZ local clock times, with offset_hours telling us how far ahead
-## of UTC that clock time sits: 12 hours during NZST, 13 during NZDT. Since
-## the RSAM data is UTC, every window is converted to UTC by subtracting
-## its offset.
+## All times below are UTC, the same as the RSAM data, so no time-zone
+## conversion is done. The NZ local times are in the comments for reference.
 
-eruption_windows_raw <- tribble(
-  ~label,                                       ~nz_start,              ~nz_end,                ~offset_hours,
-  "28 Apr 2016 eruption",                       "2016-04-28 11:30:00",  "2016-04-28 18:44:59",   12,
-  "13-15 Sep 2016 eruption",                    "2016-09-13 15:15:00",  "2016-09-15 12:14:59",   12,
-  "9 Dec 2019 explosive eruption",              "2019-12-09 14:30:00",  "2019-12-09 16:24:59",   13,
-  "9-12 Dec 2019 continued eruptive activity",  "2019-12-09 16:25:00",  "2019-12-12 10:19:59",   13
-)
-
-eruption_windows <- eruption_windows_raw %>%
+eruption_windows <- tribble(
+  ~label,                                       ~start,                 ~end,
+  "27 Apr 2016 eruption",                       "2016-04-27 09:36:00",  "2016-04-28 06:44:59",  # onset 09:36 UTC (21:36 NZST 27 Apr) from published paper; end from catalogue
+  "13-15 Sep 2016 eruption",                    "2016-09-13 03:15:00",  "2016-09-15 00:14:59",  # NZST 13 Sep 15:15:00 - 15 Sep 12:14:59
+  "9 Dec 2019 explosive eruption",              "2019-12-09 01:30:00",  "2019-12-09 03:24:59",  # NZDT 9 Dec 14:30:00 - 16:24:59
+  "9-12 Dec 2019 continued eruptive activity",  "2019-12-09 03:25:00",  "2019-12-11 21:19:59"   # NZDT 9 Dec 16:25:00 - 12 Dec 10:19:59
+) %>%
   mutate(
-    nz_start = as.POSIXct(nz_start, tz = "UTC"),   # tagged UTC only so R can do
-    nz_end   = as.POSIXct(nz_end,   tz = "UTC"),   # arithmetic on it - the values
-    # themselves are still the NZ local clock times written above
-    start = nz_start - hours(offset_hours),
-    end   = nz_end   - hours(offset_hours)
-  ) %>%
-  select(label, start, end)
+    start = ymd_hms(start, tz = "UTC"),
+    end   = ymd_hms(end,   tz = "UTC")
+  )
+
+## Quick check: these should match the UTC times in the eruption catalogue
+print(eruption_windows)
 
 ## ---- Step 6: shared theme ---------------------------------------------------
 
@@ -338,31 +337,67 @@ ggsave(file.path(RESULTS_DIR, "WSRZ_2014to2019_full_rsam_highlighted.pdf"),  p_w
 
 ZOOM_PAD_DAYS <- 4  # days of context shown before/after each eruption window
 
-plot_zoom <- function(wiz_d, wsrz_d, label, win_start, win_end, pad_days = ZOOM_PAD_DAYS) {
-  zoom_start <- win_start - days(pad_days)
-  zoom_end   <- win_end   + days(pad_days)
+## Choose time-label spacing from the length of the plotted period, so every
+## zoom gets readable clock times. Major breaks get a label; minor breaks are
+## unlabelled tick/grid positions.
+choose_time_breaks <- function(zoom_start, zoom_end) {
+  span_hours <- as.numeric(difftime(zoom_end, zoom_start, units = "hours"))
+  if (span_hours <= 3) {
+    list(major = "10 mins",  minor = "1 min",   labels = "%H:%M")
+  } else if (span_hours <= 12) {
+    list(major = "1 hour",   minor = "10 mins", labels = "%H:%M")
+  } else if (span_hours <= 48) {
+    list(major = "3 hours",  minor = "1 hour",  labels = "%d %b\n%H:%M")
+  } else if (span_hours <= 7 * 24) {
+    list(major = "6 hours",  minor = "1 hour",  labels = "%d %b\n%H:%M")
+  } else {
+    list(major = "12 hours", minor = "3 hours", labels = "%d %b\n%H:%M")
+  }
+}
+
+## zoom_start / zoom_end default to the eruption window +/- pad_days, but can
+## be given directly for a custom close-up.
+plot_zoom <- function(wiz_d, wsrz_d, label, win_start, win_end,
+                      pad_days   = ZOOM_PAD_DAYS,
+                      zoom_start = floor_date(win_start - days(pad_days), "day"),
+                      zoom_end   = ceiling_date(win_end + days(pad_days), "day")) {
   
   d_zoom <- bind_rows(
     wiz_d  %>% filter(utc_time >= zoom_start, utc_time <= zoom_end) %>% mutate(station = "WIZ"),
     wsrz_d %>% filter(utc_time >= zoom_start, utc_time <= zoom_end) %>% mutate(station = "WSRZ")
   )
   
+  brk <- choose_time_breaks(zoom_start, zoom_end)
+  
+  ## only shade the part of the eruption window that falls inside the plot
+  shade <- tibble(xmin = max(win_start, zoom_start), xmax = min(win_end, zoom_end))
+  
   ggplot(d_zoom, aes(x = utc_time, y = RSAM, color = station)) +
     geom_rect(
-      data = tibble(xmin = win_start, xmax = win_end),
-      inherit.aes = FALSE,
+      data = shade, inherit.aes = FALSE,
       aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf),
       fill = "red", alpha = 0.15
     ) +
     geom_line(linewidth = 0.4) +
     scale_color_manual(values = station_colors) +
-    scale_x_datetime(date_labels = "%d %b\n%H:%M") +
+    scale_x_datetime(
+      limits            = c(zoom_start, zoom_end),
+      date_breaks       = brk$major,
+      date_minor_breaks = brk$minor,
+      date_labels       = brk$labels,
+      expand            = c(0, 0)
+    ) +
+    guides(x = guide_axis(minor.ticks = TRUE)) +   # small unlabelled ticks between labels (needs ggplot2 >= 3.5.0)
     labs(
       title = label,
       x = paste0("Date/Time (", TIME_AXIS_LABEL, ")"), y = "RSAM (avg)", color = NULL
     ) +
     theme_plain_serif +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 9))
+    theme(
+      axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, size = 8),
+      axis.minor.ticks.length.x = rel(0.5),
+      axis.ticks.length.x = unit(3, "pt")
+    )
 }
 
 eruption_windows_valid <- eruption_windows %>% filter(!is.na(start), !is.na(end))
@@ -380,11 +415,39 @@ zoom_plots <- pmap(
 )
 names(zoom_plots) <- eruption_windows_valid$label
 
+## ---- Step 10: detailed close-ups with finer clock times ---------------------
+## Each row is one close-up: the eruption window it relates to, plus the exact
+## period to show. Label spacing is picked automatically from the period
+## length (see choose_time_breaks). Add or edit rows as needed.
+
+apr16 <- eruption_windows_valid %>% filter(label == "27 Apr 2016 eruption")
+
+detail_windows <- tribble(
+  ~label,                                         ~zoom_start,            ~zoom_end,
+  "27-28 Apr 2016 (full two days)",               "2016-04-27 00:00:00",  "2016-04-28 23:59:59",
+  "27 Apr 2016 eruption onset (09:00-10:30 UTC)", "2016-04-27 09:00:00",  "2016-04-27 10:30:00"
+) %>%
+  mutate(zoom_start = ymd_hms(zoom_start, tz = "UTC"),
+         zoom_end   = ymd_hms(zoom_end,   tz = "UTC"))
+
+detail_plots <- pmap(
+  detail_windows,
+  function(label, zoom_start, zoom_end) plot_zoom(
+    wiz, wsrz, label, apr16$start, apr16$end,
+    zoom_start = zoom_start, zoom_end = zoom_end
+  )
+)
+names(detail_plots) <- detail_windows$label
+
+zoom_plots <- c(zoom_plots, detail_plots)
+
+## ---- Display and save all zoom plots ------------------------------------------
+
 walk(zoom_plots, print)
 
 walk2(zoom_plots, names(zoom_plots), function(p, label) {
   fname <- paste0("zoom_", gsub("[^A-Za-z0-9]+", "_", label), ".pdf")
-  ggsave(file.path(RESULTS_DIR, fname), p, width = 10, height = 5)
+  ggsave(file.path(RESULTS_DIR, fname), p, width = 12, height = 5)
 })
 
 cat(sprintf("\nSaved %d full-period plots and %d zoom plots to %s\n",

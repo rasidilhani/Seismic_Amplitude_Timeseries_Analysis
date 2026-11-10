@@ -1,0 +1,60 @@
+\begin{thebibliography}{1}
+
+\bibitem{Bandt2002}
+C.~Bandt and B.~Pompe.
+\newblock Permutation entropy: A natural complexity measure for time series.
+\newblock {\em Phys. Rev. Lett.}, 88:174102, Apr 2002.
+
+\bibitem{Endo1991}
+E.T. Endo and T.~Murray.
+\newblock Real-time seismic amplitude measurement ({RSAM}): A volcano
+  monitoring and prediction tool.
+\newblock {\em Bulletin of Volcanology}, 53(7):533--545, 1991.
+
+\bibitem{GeoNetVAL}
+{GeoNet}.
+\newblock Volcanic alert levels: Historical records and data documentation,
+  n.d.
+\newblock Version 3 definitions and data-field documentation.
+
+\bibitem{lamberti2004intensive}
+P.~W. Lamberti, M.~T. Martin, A.~Plastino, and O.~A. Rosso.
+\newblock Intensive entropic non-triviality measure.
+\newblock {\em Physica A: Statistical Mechanics and its Applications},
+  334(1-2):119--131, 2004.
+
+\bibitem{lopez1995statistical}
+R.~Lopez-Ruiz, H.~L. Mancini, and X.~Calbet.
+\newblock A statistical measure of complexity.
+\newblock {\em Physics letters A}, 209(5-6):321--326, 1995.
+
+\bibitem{Rey2024Asymptotic}
+A.~Rey, A.~C. Frery, J.~Gambini, and M.~Lucini.
+\newblock Asymptotic distribution of entropies and fisher information measure
+  of ordinal patterns with applications.
+\newblock {\em Chaos, Solitons \& Fractals}, 188:115481, 2024.
+
+\bibitem{ReyDevesa2023}
+P.~Rey-Devesa, J.~Prudencio, C.~Ben{\'i}tez, M.~Bret{\'o}n, I.~Plasencia,
+  Z.~Le{\'o}n, F.~Ortigosa, L.~Guti{\'e}rrez, R.~Ar{\'a}mbula-Mendoza, and J.M.
+  Ib{\'a}{\~n}ez.
+\newblock Tracking volcanic explosions using shannon entropy at volc{\'a}n de
+  colima.
+\newblock {\em Scientific Reports}, 13(1):9807, 2023.
+
+\bibitem{Sudibyo2022}
+Maria R.~P. Sudibyo, Eva P.~S. Eibl, Sebastian Hainzl, and Gylfi~Páll Hersir.
+\newblock Eruption forecasting of strokkur geyser, iceland, using permutation
+  entropy.
+\newblock {\em Journal of Geophysical Research: Solid Earth}, 127(10), October
+  2022.
+
+\bibitem{Telesca2014}
+L.~Telesca, M.~Lovallo, J.~Mart{\'i} Molist, C.~L{\'o}pez Moreno, and R.~Abella
+  Mel{\'e}ndez.
+\newblock Using the fisher--shannon method to characterize continuous seismic
+  signal during volcanic eruptions: Application to the 2011--2012 el hierro
+  (canary islands) eruption.
+\newblock {\em Terra Nova}, 26(6):425--429, 2014.
+
+\end{thebibliography}

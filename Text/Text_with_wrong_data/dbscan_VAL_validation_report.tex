@@ -1,0 +1,314 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{times}
+\usepackage[table]{xcolor}
+\usepackage{float}
+\usepackage{siunitx}
+
+% Update this path if the figures are stored elsewhere.
+% Expected files:
+% DBSCAN_kNN_distance_plot.pdf
+% DBSCAN_VAL_PCA_plot.pdf
+% VAL_DBSCAN_Sankey.pdf
+\newcommand{\figpath}{../figures/dbscan_val_validation}
+
+\title{Anomaly Detection and Classification of VAL-Related Eruptive Activity Using Weekly RSAM Ordinal-Pattern Features at Whakaari/White Island (2007--2019)}
+\author{Rasika Dilhani \\ Victoria University of Wellington}
+\date{\today}
+
+\begin{document}
+	
+	\maketitle
+	
+	\begin{abstract}
+		Weekly ordinal-pattern features derived from Real-time Seismic Amplitude 		Measurement (RSAM) data at the WIZ station, Whakaari/White Island, were 		analysed for the period 2007-2019. The aim was to determine whether unusual 
+		weekly seismic dynamics could be identified from the ordinal-pattern features
+		and whether those patterns corresponded to activity documented in the
+		Volcanic Alert Level (VAL) record. Because the meanings of the numerical VAL
+		levels differ between VAL system versions 2 and 3, ground-truth classes were
+		defined from the official activity descriptions rather than from a numerical
+		VAL threshold. This produced 772 unrest windows, 19 minor eruption/activity
+		windows, and one moderate-eruption window. For supervised modelling, the two
+		eruption categories were combined into an eruptive class, giving 20 eruptive
+		and 772 unrest windows.
+		
+		DBSCAN was applied to seven standardized ordinal-pattern features, using
+		$\varepsilon=1.1$ and $\mathrm{minPts}=14$. It identified 45 noise points, but
+		none corresponded to an eruptive window. Its sensitivity was therefore zero
+		and its balanced accuracy was 0.471. Weighted radial-basis-function support
+		vector machine (SVM) and weighted logistic generalized linear model (GLM)
+		classifiers were evaluated using repeated stratified five-fold
+		cross-validation. The SVM selected $C=10$ and $\gamma=0.05$ and achieved mean
+		balanced accuracy 0.604, mean sensitivity 0.465, mean specificity 0.743, and
+		mean F1 score 0.081. The GLM achieved mean balanced accuracy 0.553, mean
+		sensitivity 0.540, mean specificity 0.567, and mean F1 score 0.058. These
+		results show that the documented eruptive windows are not global
+		low-density outliers in the selected feature space. Supervised learning
+		provides some discrimination, particularly with the SVM, but the very low
+		prevalence of eruptive windows and low F1 scores prevent reliable eruption
+		classification from these weekly features alone.
+	\end{abstract}
+	
+\section{Background and Objective}
+
+RSAM provides a continuous summary of seismic amplitude and is widely used to monitor changes in volcanic seismic activity. In this study, ordinal-pattern analysis was used to characterise the temporal structure of weekly RSAM observations recorded at the WIZ station on Whakaari/White Island. The resulting information-theoretic features describe the disorder, local ordering, and complexity of the ordinal-pattern distributions.
+
+Figure~\ref{fig:hc-overview} provides an initial overview of the weekly RSAM observations from 2007 to 2019 in the Shannon, Tsallis, R\'enyi, and Fisher information--complexity planes. Most weekly observations occupy relatively dense regions of the feature space, whereas several weeks appear towards its outer regions. The labelled points indicate weeks with extreme entropy and complexity values and are treated only as candidate feature-space anomalies. They do not represent confirmed eruptions or DBSCAN classifications.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.95\textwidth]
+	{\figpath/HC_Plane_RSAM_2007_2019}
+	\caption{Weekly RSAM observations from 2007 to 2019 in the Shannon,
+		Tsallis, R\'enyi, and Fisher information--complexity planes.
+		Labelled observations represent weeks with extreme feature values;
+		the remaining observations represent the dominant feature-space
+		distribution.}
+	\label{fig:hc-overview}
+\end{figure}
+
+The visual structure in Figure~\ref{fig:hc-overview} motivates a formal assessment of whether unusual weekly dynamics can be identified and whether they correspond to documented eruptive activity. Three modelling approaches were therefore considered. DBSCAN was used for
+unsupervised anomaly detection, while weighted radial SVM and weighted logistic GLM models were used to assess supervised separation between VAL-derived eruptive and unrest windows. The DBSCAN anomalies were compared with the VAL record only after clustering; therefore, they
+were not automatically interpreted as eruption events.
+
+	\section{Data and Methods}
+
+\subsection{Weekly ordinal-pattern features}
+
+The input data consisted of 792 weekly windows from 2007--2019 with complete values for the features used in the analysis. The broader ordinal-pattern analysis produced 13 measures: Shannon, R\'enyi, and Tsallis permutation entropy and statistical complexity; Fisher information and Fisher complexity; four variance terms; and disequilibrium. A previous Spearman correlation assessment showed substantial redundancy within the full set.
+The following reduced seven-feature subset was therefore retained:
+
+\begin{itemize}
+	\item $H_{\text{Fisher}}$,
+	\item $C_{\text{Fisher}}$,
+	\item Disequilibrium,
+	\item $\mathrm{Var}(H_{\text{Shannon}})$,
+	\item $\mathrm{Var}(H_{\text{R\'enyi}})$,
+	\item $\mathrm{Var}(H_{\text{Tsallis}})$,
+	\item $\mathrm{Var}(C_{\text{Shannon}})$.
+\end{itemize}
+
+The variables were standardized to zero mean and unit variance before DBSCAN because its neighborhoods are distance based. The radial SVM implementation scaled predictors within model fitting. The GLM was fitted to the original feature scales; its predictive performance was evaluated by held-out fold predictions rather than by the apparent fit to the complete data.
+
+\subsection{Description-based VAL ground truth}
+
+The VAL record contains 18 periods under system version~2 and 33 periods under system version~3. System version~2 includes only VAL~1 and VAL~2, whereas system version~3 includes all four numerical levels. In particular, VAL~3 and VAL~4 occur only under system version~3.
+Furthermore, the interpretation of VAL~1 and VAL~2 differs between the two system versions. Therefore, the activity classes were defined using the official VAL descriptions rather than the numerical levels alone.
+
+Figure~\ref{fig:val-description-sankey} illustrates how the numerical VAL levels are linked to the two VAL system versions and their corresponding activity descriptions. The figure demonstrates why the numerical VAL value alone is insufficient for constructing consistent
+activity classes across the complete study period.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.95\textwidth]
+	{\figpath/VAL_System_Description_Sankey}
+	\caption{Relationship between the numerical Volcanic Alert Levels,
+		VAL system versions, and official activity descriptions. Flow width
+		represents the number of recorded VAL periods.}
+	\label{fig:val-description-sankey}
+\end{figure}
+
+The numerical VAL codes could not be used alone because their meanings changed between system versions. In system version 2, VAL~2 was described as ``minor eruptive activity,'' whereas in system version 3, VAL~2 represented ``moderate to heightened volcanic unrest.'' A rule such as VAL~$\geq 2$ would therefore combine different physical interpretations and would incorrectly describe VAL~1 as an absence of unrest.
+
+The official VAL descriptions were instead grouped into three classes:
+
+\begin{align*}
+	\text{Unrest}:&\quad
+	\begin{cases}
+		\text{Signs of volcano unrest},\\
+		\text{Minor volcanic unrest},\\
+		\text{Moderate to heightened volcanic unrest};
+	\end{cases}\\[3pt]
+	\text{Minor eruption/activity}:&\quad
+	\begin{cases}
+		\text{Minor eruptive activity},\\
+		\text{Minor volcanic eruption};
+	\end{cases}\\[3pt]
+	\text{Moderate eruption}:&\quad
+	\text{Moderate volcanic eruption}.
+\end{align*}
+
+A weekly window was assigned the most severe class occurring at any time within that window. Thus, a short eruption was retained even when unrest occupied most of the seven-day interval. This ``any-overlap'' rule is more appropriate for eruption detection than assigning the state having the longest overlap, which could erase a brief eruption from the weekly label.
+
+The three-class labels were retained for scientific interpretation and for comparison with DBSCAN. The two eruption categories were combined only for supervised modelling:
+
+\begin{equation*}
+	\text{Model label}=
+	\begin{cases}
+		\text{Eruptive}, & \text{minor eruption/activity or moderate eruption},\\
+		\text{Unrest}, & \text{otherwise}.
+	\end{cases}
+\end{equation*}
+
+This binary formulation does not represent ``unrest versus no unrest.'' It specifically represents documented eruptive activity versus documented unrest.
+
+\begin{table}[H]
+	\centering
+	\caption{VAL activity labels assigned to the 792 weekly windows.}
+	\label{tab:class-counts}
+	\begin{tabular}{lrr}
+		\toprule
+		VAL-derived class & Number of windows & Percentage \\
+		\midrule
+		Unrest & 772 & \SI{97.47}{\percent} \\
+		Minor eruption/activity & 19 & \SI{2.40}{\percent} \\
+		Moderate eruption & 1 & \SI{0.13}{\percent} \\
+		\midrule
+		Combined eruptive class & 20 & \SI{2.53}{\percent} \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\subsection{DBSCAN anomaly detection}
+
+DBSCAN was applied to all 792 standardized seven-feature observations. The minimum-neighborhood size was set to twice the number of features, $\mathrm{minPts}=14$. Inspection of the 14th-nearest-neighbor distance plot guided the selection $\varepsilon=1.1$. DBSCAN cluster label 0 was interpreted as an anomaly, while nonzero cluster membership was interpreted as belonging to a dense cluster. For comparison with the binary VAL label, an anomaly was treated as an eruptive prediction and a clustered point as an unrest prediction. This mapping was used only to quantify correspondence; it does not
+imply that every feature-space anomaly is volcanic eruption activity.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.75\textwidth]{\figpath/DBSCAN_kNN_distance_plot}
+	\caption{The 14th-nearest-neighbor distance plot used to guide the choice
+		of $\varepsilon=1.1$ for DBSCAN.}
+	\label{fig:knn}
+\end{figure}
+
+\subsection{Weighted supervised models and validation}
+
+The supervised analysis used the 20 eruptive and 772 unrest windows. Because a single 70-30 split would place only about six eruptive observations in the test subset, its sensitivity would depend strongly on a few observations. Repeated stratified five-fold cross-validation was used instead. The GLM was evaluated over 20 repeated partitions, while the computationally larger SVM grid search used 10 repeats. Inverse-frequency class weights were applied in each model so that the minority eruptive class contributed more strongly to
+the fitted decision rule.
+
+The SVM used a radial basis function kernel. The grid search examined
+
+\begin{align*}
+	C &\in \{0.1,1,10,100,1000\},\\
+	\gamma &\in \{0.001,0.005,0.01,0.05,0.1,0.5,1,5\}.
+\end{align*}
+
+The combination with the largest mean balanced accuracy was selected. A weighted binomial GLM with a probability threshold of 0.5 was used as a linear, interpretable supervised comparison. Balanced accuracy, sensitivity, specificity, and F1 score were emphasized because ordinary accuracy is dominated by the \SI{97.47}{\percent} unrest prevalence. For each supervised method, a single five-fold out-of-fold confusion matrix was also generated: every observation was predicted by a fold-specific model that excluded it from fitting. These matrices illustrate the prediction counts for one fold assignment, whereas the repeated-CV averages provide the primary performance estimates.
+
+\section{Results}
+
+\subsection{DBSCAN anomalies and VAL activity}
+
+DBSCAN produced one dense cluster containing 747 observations and classified 45 observations as noise. Table~\ref{tab:dbscan-three} shows that all 45 noise points occurred during unrest. None of the 19 minor eruption/activity windows or the single moderate-eruption window was identified as a DBSCAN anomaly.
+
+\begin{table}[H]
+	\centering
+	\caption{DBSCAN status cross-tabulated with the three-class VAL ground truth.}
+	\label{tab:dbscan-three}
+	\begin{tabular}{lrr}
+		\toprule
+		VAL activity class & Anomaly & Clustered \\
+		\midrule
+		Unrest & 45 & 727 \\
+		Minor eruption/activity & 0 & 19 \\
+		Moderate eruption & 0 & 1 \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+When DBSCAN noise was evaluated as a candidate indicator of the combined eruptive class, the resulting counts were $TP=0$, $FP=45$, $FN=20$, and $TN=727$. Sensitivity was 0, specificity was 0.942, and balanced accuracy was 0.471. Precision and F1 were undefined because no true-positive eruption prediction occurred. The ordinary accuracy of 0.918 is not evidence of useful classification: predicting every observation as unrest would achieve an accuracy of 0.975 because of the class imbalance.
+
+Figure~\ref{fig:sankey} provides a descriptive view of the same counts. The large unrest flow reflects the strongly imbalanced class distribution. The figure should not be interpreted as an independent validation statistic.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.9\textwidth]{\figpath/VAL_DBSCAN_Sankey}
+	\caption{Relationship between VAL activity class and DBSCAN anomaly status
+		for the 792 weekly windows. Flow width represents the number of windows.}
+	\label{fig:sankey}
+\end{figure}
+
+The PCA display in Figure~\ref{fig:pca-dbscan} supports this result visually. The VAL-derived eruptive observations do not form a separate low-density group selected by DBSCAN. Conversely, the 45 noise observations may reflect unusual seismic dynamics during unrest, data-quality effects, or variation not represented by an eruptive VAL classification. They should therefore be described as feature-space anomalies, not false eruptions in a physical sense.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.85\textwidth]{\figpath/DBSCAN_VAL_PCA_plot}
+	\caption{Projection onto the first two principal components of the seven
+		standardized features, colored by VAL activity class and shaped by DBSCAN
+		status. The PCA coordinates are used only for visualization; DBSCAN was fitted
+		in the complete seven-dimensional feature space.}
+	\label{fig:pca-dbscan}
+\end{figure}
+
+\subsection{Weighted radial SVM}
+
+The best SVM parameters were $C=10$ and $\gamma=0.05$. This combination was inside the expanded parameter grid rather than on its boundary. Across the 10 repeated five-fold partitions it achieved mean balanced accuracy 0.604 ($SD=0.044$), mean sensitivity 0.465, mean specificity 0.743, and mean F1 score 0.081. Table~\ref{tab:svm-grid} shows the leading grid combinations.
+Several neighboring settings produced similar performance, indicating that the selected values represent a modest performance region rather than an isolated numerical optimum.
+
+\begin{table}[H]
+	\centering
+	\caption{Leading radial SVM hyperparameter combinations ranked by mean
+		balanced accuracy from repeated stratified five-fold cross-validation.}
+	\label{tab:svm-grid}
+	\small
+	\begin{tabular}{rrrrrr}
+		\toprule
+		$C$ & $\gamma$ & Mean balanced accuracy & SD & Sensitivity & Specificity \\
+		\midrule
+		10   & 0.050 & 0.604 & 0.044 & 0.465 & 0.743 \\
+		100  & 0.050 & 0.599 & 0.043 & 0.420 & 0.777 \\
+		1000 & 0.010 & 0.598 & 0.043 & 0.445 & 0.751 \\
+		10   & 0.100 & 0.597 & 0.041 & 0.440 & 0.755 \\
+		1000 & 0.005 & 0.594 & 0.042 & 0.495 & 0.692 \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+In the representative out-of-fold five-fold pass, the SVM produced $TP=10$, $FP=184$, $FN=10$, and $TN=588$. This corresponds to sensitivity 0.500, specificity 0.762, precision 0.052, F1 score 0.093, and balanced accuracy 0.631. The SVM detected more eruptive windows than DBSCAN, but only about one in 19 of its eruptive predictions was correct. Thus, the model provides modest class separation while producing many false-positive alerts.
+
+\subsection{Weighted logistic GLM}
+
+Across 20 repeated five-fold partitions, the weighted logistic GLM achieved mean balanced accuracy 0.553, mean sensitivity 0.540, mean specificity 0.567, and mean F1 score 0.058. In the representative out-of-fold pass, it produced $TP=9$, $FP=340$, $FN=11$, and $TN=432$. The corresponding sensitivity was 0.450, specificity 0.560, precision 0.026, F1 score 0.049, and balanced accuracy 0.505.
+
+The GLM was more sensitive on average than the SVM, but it classified a much larger proportion of unrest windows as eruptive. Its very low precision means that most positive predictions were false alarms. Warnings concerning ``non-integer successes'' arose because inverse-frequency fractional case weights were supplied to a binomial GLM; they do not by themselves indicate that optimization failed. Nevertheless, coefficient interpretation should be made cautiously because of the rare outcome and correlated temporal windows.
+
+\subsection{Comparison of methods}
+
+Table~\ref{tab:model-comparison} summarizes the primary results. The DBSCAN row is an in-sample correspondence assessment across all observations, whereas the SVM and GLM rows are averages from repeated cross-validation. The values therefore answer related but not identical questions: DBSCAN measures whether eruption windows are global density anomalies, while the supervised models measure predictive separability using known labels.
+
+\begin{table}[H]
+	\centering
+	\caption{Comparison of DBSCAN correspondence and repeated-cross-validation
+		performance of the weighted supervised models.}
+	\label{tab:model-comparison}
+	\begin{tabular}{lrrrr}
+		\toprule
+		Method & Balanced accuracy & Sensitivity & Specificity & F1 \\
+		\midrule
+		DBSCAN anomaly flag & 0.471 & 0.000 & 0.942 & -- \\
+		Weighted radial SVM & 0.604 & 0.465 & 0.743 & 0.081 \\
+		Weighted logistic GLM & 0.553 & 0.540 & 0.567 & 0.058 \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+DBSCAN failed to recover the documented eruptive windows because those observations were located within the dense feature-space cluster. The SVM provided the largest mean balanced accuracy and a better sensitivity-specificity compromise than the GLM. The GLM obtained the largest mean sensitivity, but this was achieved through a substantially higher false-alert
+rate. All F1 values remained very low, showing that positive predictions were not precise under the extreme class imbalance.
+
+\section{Discussion}
+
+The corrected VAL interpretation changes the scientific question from ``elevated VAL versus baseline'' to ``documented eruptive activity versus documented unrest.'' This distinction is essential because VAL~1 itself denotes unrest, and VAL~2 has different meanings under system versions 2 and 3. The description-based mapping avoids assigning physically inconsistent
+labels across the 2007--2019 record.
+
+The negative DBSCAN result does not imply that the ordinal-pattern features contain no useful information. DBSCAN searches for observations outside dense regions without using VAL labels. An eruption-related observation may differ systematically from unrest observations while still remaining inside a dense region. The improved SVM balanced accuracy is consistent with this possibility, although its low precision shows that the separation is weak.
+
+There are three important limitations. First, only 20 of 792 windows were labeled eruptive, and only one represented a moderate eruption. Separate three-class supervised modelling would therefore be unreliable. Second, the weekly temporal scale can dilute short-lived eruption signals even though the any-overlap rule preserves their ground-truth labels. Daily or hourly feature windows may provide a closer match to brief activity changes. Third, nearby or overlapping weekly windows are temporally dependent. Although repeated stratified cross-validation reduces sensitivity to a single random split, it does not provide the same evidence as validation on entirely independent eruption episodes. Future analyses should, where the number of episodes permits, hold out complete eruption episodes or contiguous time blocks.
+
+The choice of $\varepsilon$ should continue to be guided by feature-space geometry rather than adjusted specifically to force known eruption windows into DBSCAN's noise class. Such outcome-guided adjustment would compromise the unsupervised interpretation. Examination of the 45 unrest-period anomalies may instead reveal other meaningful changes in seismic dynamics or data quality that are not encoded by the eruption label.
+
+\section{Conclusion}
+
+Description-based interpretation of the VAL record identified 20 weekly windows overlapping documented eruptive activity and 772 unrest windows. At $\varepsilon=1.1$ and $\mathrm{minPts}=14$, DBSCAN identified 45 feature-space anomalies, but none corresponded to an eruptive window. Documented eruptive activity was therefore not expressed as global low-density behavior in the selected seven-dimensional ordinal-pattern feature space.
+
+Weighted supervised classification recovered part of the signal. The radial SVM achieved the strongest overall compromise, with mean balanced accuracy 0.604, sensitivity 0.465, and specificity 0.743 under repeated stratified cross-validation. The weighted GLM achieved higher mean sensitivity (0.540) but lower specificity (0.567) and a lower F1 score. These results provide evidence of modest supervised class separability but not reliable eruption
+detection. The next methodological priority is to evaluate shorter temporal windows and, when sufficient independent events are available, validation schemes that hold out entire eruption episodes.	
+
+	
+\end{document}

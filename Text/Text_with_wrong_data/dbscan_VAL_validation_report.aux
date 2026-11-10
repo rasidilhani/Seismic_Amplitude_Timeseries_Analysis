@@ -1,0 +1,37 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Background and Objective}{1}{section.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Weekly RSAM observations from 2007 to 2019 in the Shannon, Tsallis, R\'enyi, and Fisher information--complexity planes. Labelled observations represent weeks with extreme feature values; the remaining observations represent the dominant feature-space distribution.}}{2}{figure.caption.1}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{fig:hc-overview}{{1}{2}{Weekly RSAM observations from 2007 to 2019 in the Shannon, Tsallis, R\'enyi, and Fisher information--complexity planes. Labelled observations represent weeks with extreme feature values; the remaining observations represent the dominant feature-space distribution}{figure.caption.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Data and Methods}{2}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Weekly ordinal-pattern features}{2}{subsection.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Description-based VAL ground truth}{3}{subsection.2.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Relationship between the numerical Volcanic Alert Levels, VAL system versions, and official activity descriptions. Flow width represents the number of recorded VAL periods.}}{3}{figure.caption.2}\protected@file@percent }
+\newlabel{fig:val-description-sankey}{{2}{3}{Relationship between the numerical Volcanic Alert Levels, VAL system versions, and official activity descriptions. Flow width represents the number of recorded VAL periods}{figure.caption.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces VAL activity labels assigned to the 792 weekly windows.}}{4}{table.caption.3}\protected@file@percent }
+\newlabel{tab:class-counts}{{1}{4}{VAL activity labels assigned to the 792 weekly windows}{table.caption.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}DBSCAN anomaly detection}{4}{subsection.2.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces The 14th-nearest-neighbor distance plot used to guide the choice of $\varepsilon =1.1$ for DBSCAN.}}{5}{figure.caption.4}\protected@file@percent }
+\newlabel{fig:knn}{{3}{5}{The 14th-nearest-neighbor distance plot used to guide the choice of $\varepsilon =1.1$ for DBSCAN}{figure.caption.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Weighted supervised models and validation}{5}{subsection.2.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Results}{5}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}DBSCAN anomalies and VAL activity}{5}{subsection.3.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces DBSCAN status cross-tabulated with the three-class VAL ground truth.}}{6}{table.caption.5}\protected@file@percent }
+\newlabel{tab:dbscan-three}{{2}{6}{DBSCAN status cross-tabulated with the three-class VAL ground truth}{table.caption.5}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Relationship between VAL activity class and DBSCAN anomaly status for the 792 weekly windows. Flow width represents the number of windows.}}{6}{figure.caption.6}\protected@file@percent }
+\newlabel{fig:sankey}{{4}{6}{Relationship between VAL activity class and DBSCAN anomaly status for the 792 weekly windows. Flow width represents the number of windows}{figure.caption.6}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Projection onto the first two principal components of the seven standardized features, colored by VAL activity class and shaped by DBSCAN status. The PCA coordinates are used only for visualization; DBSCAN was fitted in the complete seven-dimensional feature space.}}{7}{figure.caption.7}\protected@file@percent }
+\newlabel{fig:pca-dbscan}{{5}{7}{Projection onto the first two principal components of the seven standardized features, colored by VAL activity class and shaped by DBSCAN status. The PCA coordinates are used only for visualization; DBSCAN was fitted in the complete seven-dimensional feature space}{figure.caption.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Weighted radial SVM}{7}{subsection.3.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Leading radial SVM hyperparameter combinations ranked by mean balanced accuracy from repeated stratified five-fold cross-validation.}}{7}{table.caption.8}\protected@file@percent }
+\newlabel{tab:svm-grid}{{3}{7}{Leading radial SVM hyperparameter combinations ranked by mean balanced accuracy from repeated stratified five-fold cross-validation}{table.caption.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Weighted logistic GLM}{8}{subsection.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Comparison of methods}{8}{subsection.3.4}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Comparison of DBSCAN correspondence and repeated-cross-validation performance of the weighted supervised models.}}{8}{table.caption.9}\protected@file@percent }
+\newlabel{tab:model-comparison}{{4}{8}{Comparison of DBSCAN correspondence and repeated-cross-validation performance of the weighted supervised models}{table.caption.9}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Discussion}{8}{section.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Conclusion}{9}{section.5}\protected@file@percent }
+\gdef \@abspage@last{9}

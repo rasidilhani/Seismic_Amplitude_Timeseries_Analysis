@@ -1,0 +1,647 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{caption}
+\captionsetup[figure]{font=small}
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{siunitx}
+\usepackage{hyperref}
+\usepackage{bm}
+%\usepackage{natbib}
+\usepackage{multirow}
+\usepackage{makecell}
+
+\sisetup{
+	scientific-notation = true,
+	round-mode          = places,
+	round-precision     = 2,
+	table-number-alignment = center
+}
+
+% ---------- PATH MACROS FOR FIGURES ----------
+% Seismic Amplitude plots
+%\newcommand{\seismic}{../../../results/seismic_amplitude}
+\newcommand{\figpatha}{../figures}
+\newcommand{\figpathb}{../figures/Hourly_analysis}
+
+\title{Seismic Amplitude Time series Analysis in the $H \times C$ Plane Using Ordinal Pattern Features}
+\author{Rasika Dilhani}
+\date{\today}
+
+\begin{document}
+	
+	\maketitle
+	
+\section{Introduction}
+
+Volcanic eruptions are among the most destructive natural hazards, posing serious risks to human life, infrastructure, aviation, and the environment. Their impacts extend beyond the eruptive event itself, producing both direct and indirect hazards. Direct hazards include pyroclastic density currents, lava flows, tephra fall, and ballistic projectiles, whereas indirect hazards such as lahars, landslides, and sediment remobilisation may continue long after eruptive activity has ceased \cite{Tilling1989}. Together, these hazards have caused substantial loss of life and widespread damage to infrastructure throughout history.
+
+Globally, approximately 800 million people are estimated to live within 100 km of an active volcano, increasing exposure to volcanic hazards \cite{Brown2015}. Fertile volcanic soils encourage agriculture and human settlement, while spectacular volcanic landscapes attract increasing numbers of tourists. Consequently, both permanent residents and visitors may be exposed to volcanic hazards during periods of unrest \cite{Small2001,Auker2013,Erfurt2022}. In addition to local impacts, explosive eruptions may inject volcanic ash into the atmosphere, posing serious risks to aviation and causing significant economic losses through disruption of international air traffic \cite{Prata2009,Tilling1989}.
+
+Whakaari (White Island), located offshore of New Zealand's North Island, is one of the country's most active volcanoes and is characterised by persistent hydrothermal activity. On 9 December 2019, Whakaari erupted unexpectedly while tourists were visiting the island, resulting in 22 fatalities and numerous serious injuries. The eruption highlighted the challenges associated with forecasting phreatic eruptions, which often occur with limited or ambiguous precursory signals. Although volcanic monitoring systems indicated ongoing unrest before the eruption, accurately identifying the transition from unrest to eruption remains a significant scientific challenge. This event has motivated continued research into objective, data-driven approaches capable of extracting subtle changes from continuous volcanic monitoring data.
+
+\subsection{Seismic monitoring and RSAM}
+
+Reducing volcanic risk relies on continuous monitoring capable of detecting changes within the volcanic system before hazardous activity occurs. In New Zealand, active volcanoes are monitored through the GeoNet programme using a multidisciplinary approach that combines seismic and acoustic observations, ground deformation measurements, volcanic gas monitoring, thermal measurements, visual observations, and geochemical analyses. These complementary observations provide insight into subsurface magma migration, hydrothermal activity, and the evolving state of volcanic unrest, supporting the assessment of volcanic hazards and the communication of volcanic alert levels to emergency management agencies and the public \cite{GNSVolcanoMonitoring}. Although multiple monitoring techniques contribute to understanding volcanic behaviour, seismic observations remain one of the most continuous and widely available sources of information because they directly record changes associated with magma movement, rock fracturing, and hydrothermal processes. Consequently, seismic data have become fundamental for investigating the temporal evolution of volcanic systems and developing quantitative methods for analysing volcanic unrest.
+
+One of the most widely used quantitative measures of volcanic seismic activity is the Real-time Seismic Amplitude Measurement (RSAM), introduced by Endo and Murray~\cite{Endo1991}. RSAM represents the average seismic amplitude computed over a predefined time interval and frequency band, providing a continuous measure of volcanic tremor intensity. Owing to its computational efficiency and operational simplicity, RSAM has become a standard monitoring parameter at volcano observatories worldwide and has been widely used to identify changes in volcanic activity and support eruption monitoring \cite{Endo1991}. Nevertheless, most existing studies rely primarily on amplitude trends, spectral characteristics, or statistical summaries of the seismic signal.
+
+Volcanic tremor is widely regarded as one of the most informative seismic signals for monitoring active volcanoes because it reflects fluid movement, magma transport, and hydrothermal processes occurring beneath the volcanic edifice. Consequently, RSAM and related seismic amplitude measures have been extensively used for monitoring volcanic unrest and have shown considerable potential for short-term eruption forecasting. Nevertheless, many existing approaches focus primarily on changes in signal amplitude or frequency characteristics, leaving the temporal organisation and dynamical complexity of the seismic signal comparatively unexplored.
+
+\subsection{Information-theoretic analysis of seismic signals}
+
+Information-theoretic approaches have increasingly been applied to volcanic seismic monitoring because they provide insight into the underlying dynamics of seismic signals beyond conventional amplitude-based measures. Unlike traditional parameters such as the Real-time Seismic Amplitude Measurement (RSAM), which primarily quantify signal intensity, information-theoretic measures characterise the temporal structure, uncertainty, and complexity of seismic signals. Consequently, they have shown considerable potential for identifying changes associated with magma migration, volcanic unrest, and eruptive activity.
+
+Telesca et al.~\cite{Telesca2014} were among the first to demonstrate the usefulness of information-theoretic measures for analysing continuous volcanic seismic signals. They applied the Fisher--Shannon method to seismic data recorded during the 2011--2012 El Hierro eruption in the Canary Islands. Their analysis showed that the Fisher Information Measure (FIM) was particularly sensitive to transitions between different stages of volcanic activity, including magma intrusion, hydraulic fracturing, magma migration, conduit opening, and eruptive tremor. These changes were not always evident from conventional seismic amplitude measurements alone, demonstrating that information-theoretic measures can reveal changes in the physical state of the volcanic system and dynamics that complement traditional monitoring techniques.
+
+Building upon this work, Rey-Devesa et al.~\cite{ReyDevesa2023} investigated whether Shannon entropy could be used to monitor explosive activity at Volc\'an de Colima, Mexico. Analysing continuous seismic records collected between 2015 and 2017, the authors observed a systematic decrease in Shannon entropy prior to major explosive eruptions. The entropy reduction occurred several days before eruption and reflected increasing regularity within the seismic signal as magma ascent became the dominant physical process. Their results demonstrated that Shannon entropy can provide useful precursor information and may complement conventional monitoring parameters by detecting subtle dynamical changes before explosive events.
+
+The applicability of Shannon entropy was subsequently extended by Rey-Devesa et al.~\cite{ReyDevesa2023JGR}, who evaluated the method across five volcanoes with contrasting eruptive styles, including Mount Etna, Mount St.~Helens, Kīlauea, Augustine Volcano, and Bezymianny. Despite the differences in volcanic behaviour, all case studies exhibited a consistent decline in Shannon entropy prior to eruption, with precursor times ranging from several hours to approximately four days. The study demonstrated that Shannon entropy provides a computationally efficient and transferable early-warning indicator that can operate directly on continuous seismic data without requiring volcano-specific physical models or extensive training datasets.
+
+Collectively, these studies demonstrate that information-theoretic measures provide valuable complementary information to conventional seismic monitoring by quantifying the evolving temporal structure and complexity of volcanic seismic signals. However, existing studies primarily estimate Shannon entropy and Fisher information directly from the statistical distribution of continuous seismic waveforms. In contrast, the present study employs an ordinal-pattern framework to construct probability distributions from the temporal ordering of seismic observations and subsequently computes Shannon, R\'enyi, and Tsallis entropies together with Fisher information and statistical complexity. By integrating multiple information-theoretic measures within the ordinal pattern framework, this study aims to provide a more comprehensive characterisation of the temporal dynamics and complexity of volcanic seismic activity.
+
+Although these studies demonstrate that information-theoretic measures can provide valuable insights into volcanic seismic activity and show promise for eruption monitoring, accurately forecasting volcanic eruptions remains a major challenge. Volcano observatories routinely issue Volcanic Alert Levels (VALs) to communicate the current state of volcanic unrest; however, these classifications primarily describe the current condition of a volcano rather than providing quantitative forecasts of the timing or likelihood of future eruptions. Forecasting is particularly challenging for hydrothermal systems such as Whakaari, where rapid changes may occur with limited or ambiguous precursory activity. These challenges motivate the development of objective computational techniques capable of extracting additional information from continuous monitoring data. In this context, information-theoretic approaches based on ordinal patterns offer a promising framework for characterising subtle changes in the temporal dynamics of seismic signals that may not be evident using conventional monitoring parameters alone.
+
+\subsection{Research Motivation and Objectives}
+
+Despite these encouraging developments, relatively few studies have investigated volcanic seismic activity using ordinal-pattern-based information-theoretic analysis. Ordinal patterns transform a time series into symbolic sequences according to the relative ordering of neighbouring observations rather than their absolute amplitudes \cite{Bandt2002}. This representation is naturally robust to observational noise and monotonic transformations while preserving the intrinsic temporal dynamics of the underlying process. Information-theoretic quantifiers derived from ordinal patterns including Shannon entropy, R\'enyi entropy, Tsallis entropy, Fisher information, and statistical complexity have demonstrated considerable success in characterising nonlinear dynamical systems across numerous scientific disciplines. Nevertheless, their application to long-term RSAM observations from Whakaari remains limited.
+
+Motivated by this research gap, this study investigates the temporal dynamics of continuous RSAM observations recorded at the WIZ seismic station on Whakaari (White Island), New Zealand(Figure~\ref{fig:whakaari}). Rather than developing an eruption forecasting model, the objective is to characterise volcanic seismic activity using ordinal pattern based information-theoretic descriptors and to investigate whether changes in entropy and complexity coincide with documented eruptive episodes. The proposed framework aims to provide additional insight into the temporal behavior of volcanic seismic signals and to evaluate the usefulness of ordinal pattern based feature extraction for analysing long-term volcanic monitoring data.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{\figpatha/Whakaari}
+	\caption{WIZ seismic station on Whakaari (White Island), New Zealand. Reproduced from TopoMap NZ \cite{TopoMapNZ}.}
+	\label{fig:whakaari}
+\end{figure}
+
+
+\section{Study Area and Data}
+
+\subsection{Study area}
+Whakaari (White Island), located approximately 48 km offshore from the eastern coast of New Zealand's North Island, is one of the country's most active stratovolcanoes. The volcano has exhibited persistent hydrothermal activity and numerous eruptive episodes over recent decades, making it an important natural laboratory for volcano monitoring research. Continuous seismic observations collected at the WIZ seismic station provide one of the longest and most comprehensive records of volcanic tremor available for Whakaari. Previous studies have demonstrated that RSAM measurements derived from these observations contain valuable information regarding changes in volcanic activity and have been successfully employed for eruption monitoring and forecasting \cite{Dempsey2020}.
+
+\subsection{Data Description}
+
+The dataset analysed in this study consists of continuous Real-time Seismic Amplitude Measurement (RSAM) observations recorded at the WIZ seismic station located on Whakaari (White Island), New Zealand, between 2007 and 2022 (Figure~\ref{fig:ts_2002-2022}). The original seismic waveform was acquired at a sampling frequency of \SI{100}{\hertz}. To reduce data volume while preserving the temporal evolution of volcanic tremor, the waveform amplitudes were averaged over one-second intervals, with each one-second observation representing the mean of 100 consecutive measurements. The resulting one-second RSAM time series provides a continuous record of seismic activity throughout the study period.
+
+Figures~\ref{fig:ts_Dec2019} and~\ref{fig:ts_8-9Dec} illustrate the RSAM time series during the December 2019 eruption period at different temporal scales. Figure~\ref{fig:ts_Dec2019} presents the complete month of December 2019, whereas Figure~\ref{fig:ts_8-9Dec} focuses on the two-day interval surrounding the eruption on 9 December 2019. These examples highlight the short-term variability in seismic tremor that motivates the subsequent ordinal pattern analysis.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{\figpathb/time_series_2007-2022}
+	\caption{Time series of 10-minute RSAM (Real-time Seismic Amplitude Measurement) values recorded at Whakaari (White Island) volcano seismic station (WIZ) from 2007 to 2022.}
+	\label{fig:ts_2002-2022}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{\figpathb/time_series_Dec2019_raw1Hz}
+	\caption{Time series of 1Hz RSAM (Real-time Seismic Amplitude Measurement) values recorded at Whakaari (White Island) volcano seismic station (WIZ) December, 2019.}
+	\label{fig:ts_Dec2019}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{\figpathb/time_series_Dec8_9_raw1Hz}
+	\caption{Time series of 1Hz RSAM (Real-time Seismic Amplitude Measurement) values recorded at Whakaari (White Island) volcano seismic station (WIZ) 8 and 9 December, 2019.}
+	\label{fig:ts_8-9Dec}
+\end{figure}
+
+\subsection{Experimental Setup}
+To study the temporal behavior of volcanic seismic activity, the one-second RSAM time series was partitioned into non-overlapping one-hour windows, each containing 3,600 observations. Each hourly segment was analysed independently using the ordinal pattern framework with embedding dimension $D=5$ and time delay $\tau=1$. For each window, the ordinal pattern probability distribution was constructed and used to compute a suite of information-theoretic quantifiers, including Shannon, R\'enyi, and Tsallis entropies, the Fisher Information Measure (FIM), and their corresponding statistical complexity measures. These quantifiers characterise complementary aspects of the seismic signal, such as uncertainty, temporal structure, and local regularity. Consequently, each one-hour window is represented as a point in the corresponding $H \times C$ plane for the Shannon, R\'enyi, and Tsallis measures, and in the Fisher information complexity plane for the Fisher Information Measure. Tracking the trajectories of these points over time enables the temporal changes of the volcanic system to be investigated and facilitates the identification of changes associated with periods of volcanic unrest and eruptive activity.
+
+Because the continuous seismic record spans multiple years, analysing every hour of data would require substantial computational resources. To improve computational efficiency, hourly windows were extracted at three-day intervals beginning on 3 July 2019 rather than processing every consecutive day. This subsampling strategy substantially reduces computation time while preserving the ability to identify long-term changes in the dynamical behavior of the volcanic system through the evolution of the $H \times C$ planes.
+
+\subsection{Experimental workflow}
+Figure~\ref{fig:workflow} summarises the complete processing workflow adopted in this study. The continuous seismic waveform, originally sampled at \SI{100}{\hertz}, was first converted into one-second RSAM observations. The resulting time series was divided into non-overlapping one-hour windows, from which ordinal pattern probability distributions were constructed using an embedding dimension of $D=5$ and time delay $\tau=1$. Information-theoretic quantifiers were subsequently computed from these probability distributions, and the resulting hourly descriptors were represented in the $H \times C$ plane for further analysis.
+
+100 Hz waveform
+↓
+1-second RSAM
+↓
+1-hour windows
+↓
+Ordinal patterns
+↓
+Probability distribution
+↓
+Entropy \& Complexity
+↓
+H×C plane
+
+\subsection{Exploratory Seismic Time Series Analysis}\label{exploratory_analysis}
+Prior to the ordinal pattern analysis, an exploratory statistical analysis was conducted to examine the temporal characteristics of the seismic time series. This preliminary investigation provides an understanding of the behaviour of the data and helps identify differences in temporal dynamics that may influence the information-theoretic descriptors.
+
+The analysis was performed separately for each calendar year (2007-2022), with the observations partitioned into monthly subsets to facilitate comparisons of temporal behaviour while reducing the influence of long-term inter-annual variability.
+
+Table~\ref{tab:annual_rsam_stats} summarise the annual descriptive statistics of the RSAM time series for the period 2007-2022. 
+The RSAM distribution is positively skewed, as indicated by the mean consistently exceeding the median in most years, suggesting the presence of occasional high-amplitude seismic events. The RSAM measurements display considerable variability across years, with coefficients of variation ranging from approximately 0.43 to 3.45. The largest relative variability occurs in 2022, followed by 2021 and 2016. In contrast, 2007, 2009, 2010, 2011, 2012, 2014, 2015, 2017, and 2018 all exhibit relatively low coefficients of variation (less than 1), indicating comparatively more stable RSAM behaviour during those years. The minimum values for all variables are close to zero except in year 2015 and 2016, while the maximum values differ by several orders of magnitude, further highlighting the intermittent nature of high amplitude seismic activity. Overall, these descriptive statistics demonstrate that both displacement and RSAM exhibit marked temporal variability over the study period, providing a basis for the subsequent analyses of temporal patterns using time series visualisation and ordinal pattern based information-theoretic measures.
+
+\begin{table}[htbp]
+	\centering
+	\caption{Descriptive statistics of annual RSAM measurements from 2011 to 2022.}
+	\label{tab:annual_rsam_stats}
+	\small
+	\begin{tabular}{
+			c
+			S[table-format=1.2e-1]
+			S[table-format=1.2e-1]
+			S[table-format=1.2e-1]
+			S[table-format=1.2e-2]
+			S[table-format=1.2e-1]
+			%S[table-format=1.2]
+			c
+		}
+		\toprule
+		Year &
+		{Mean} &
+		{Median} &
+		{SD} &
+		{Minimum} &
+		{Maximum} &
+		{CV} \\
+		\midrule
+		2007 & 6.56e-09 & 4.85e-09 & 5.99e-09 & 1.71e-19 & 6.22e-07 & 0.91 \\
+		2008 & 5.48e-09 & 3.54e-09 & 7.36e-09 & 1.01e-19 & 1.03e-06 & 1.34 \\
+		2009 & 4.94e-09 & 4.48e-09 & 2.10e-09 & 2.28e-22 & 8.66e-08 & 0.43 \\
+		2010 & 5.02e-09 & 4.15e-09 & 3.17e-09 & 4.12e-22 & 8.50e-08 & 0.63 \\
+		2011 & 6.84e-09 & 5.35e-09 & 5.62e-09 & 2.61e-21 & 2.34e-07 & 0.82 \\
+		2012 & 3.03e-08 & 2.56e-08 & 2.28e-08 & 2.00e-18 & 1.98e-07 & 0.75 \\
+		2013 & 3.56e-08 & 1.29e-08 & 4.67e-08 & 2.54e-21 & 2.46e-06 & 1.31 \\
+		2014 & 1.71e-08 & 1.38e-08 & 1.10e-08 & 1.07e-21 & 4.67e-07 & 0.65 \\
+		2015 & 2.32e-08 & 1.85e-08 & 1.69e-08 & 3.96e-09 & 1.64e-07 & 0.73 \\
+		2016 & 9.29e-09 & 3.01e-09 & 1.88e-08 & 1.05e-09 & 1.88e-06 & 2.02 \\
+		2017 & 4.57e-09 & 3.67e-09 & 4.25e-09 & 3.22e-19 & 3.69e-07 & 0.93 \\
+		2018 & 6.00e-09 & 4.43e-09 & 5.14e-09 & 8.48e-10 & 1.92e-07 & 0.86 \\
+		2019 & 1.73e-08 & 7.52e-09 & 2.44e-08 & 2.02e-20 & 6.12e-07 & 1.41 \\
+		2020 & 4.67e-09 & 3.49e-09 & 5.53e-09 & 1.68e-21 & 5.42e-07 & 1.18 \\
+		2021 & 3.43e-09 & 2.67e-09 & 8.05e-09 & 1.43e-21 & 1.54e-06 & 2.35 \\
+		2022 & 5.29e-09 & 3.79e-09 & 1.83e-08 & 2.05e-22 & 2.93e-06 & 3.45 \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+In addition, graphical summaries using violin plot was employed to visualize the annually distributions of RSAM measurements. Unlike boxplots, violin plot illustrates the shape and density of the distributions, making it easier to identify differences in spread, skewness, multimodality, and the concentration of observations. These graphical summary provides an overview of the temporal variability of the seismic measurements and help identify similarities and differences among the annual distributions before applying the ordinal pattern based feature extraction and time series clustering.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{\figpatha/yearly_violin_boxplot_RSAM_all_years}
+	\caption{Mean yearly RSAM.}
+	\label{fig:violin_boxplot_RSAM}
+\end{figure}
+
+Figure~\ref{fig:violin_boxplot_RSAM} presents the annual distributions of RSAM over the study period. The median values are consistently close to $1 \times 10^{-7}$ across all years, with only modest differences between years. However, the distributions span several orders of magnitude, reflecting the highly variable nature of volcanic seismic activity. The lower tails are broadly similar across all years, whereas the upper tails and the density of the distributions vary, indicating differences in the frequency and magnitude of high-amplitude seismic events. These inter-annual differences in the spread and extremity of the distributions highlight substantial temporal variability in the seismic measurements and motivate the subsequent ordinal-pattern-based feature extraction and clustering analysis.
+
+\section{Methodology}
+\subsection{Information Theoretic Quantifiers}
+
+For each ordinal pattern probability vector $\mathbf P=\{\mathbf p_\ell\}_{\ell=1}^{k}$, we evaluate a collection of 
+global and local information measures.  
+Given an estimator $\widehat{\mathbf P}=\{\widehat{\mathbf p}_\ell\}$ obtained from the empirical ordinal pattern frequencies, our goal is to study the behaviour of the entropy functionals $H(\widehat{ \mathbf P})$ and their associated complexity measures.
+
+\paragraph{Permutation Entropy.}
+Shannon entropy provides a quantitative measure of the uncertainty
+encoded in the ordinal pattern distribution. Given the probability
+vector
+\(\widehat{\mathbf{p}} = (\widehat{p}_1,\widehat{p}_{2},\dots,\widehat{p}_k)\),
+the normalized Shannon entropy, called Permutation entropy, is defined
+as the Shannon entropy divided by its maximum value \(\log k\), i.e., \[
+H(\widehat{\mathbf p})
+=
+-\frac{1}{\log k}
+\sum_{\ell=1}^{k}
+\widehat p_\ell \log \widehat p_\ell.
+\] 
+The normalization ensures that \(0\le H(\widehat{\mathbf p})\le1\), allowing comparisons across different embedding dimensions.
+
+In the context of ordinal analysis, \(H(\widehat{\mathbf{p}})\) is commonly referred to as permutation entropy. It captures the degree of disorder in the symbolic dynamics: low values indicate strong regularity or determinism, while high values reflect randomness or
+unpredictability. However, entropy alone cannot distinguish between randomness and structured complexity, motivating the introduction of complementary measures.
+
+\paragraph{Tsallis entropy.}
+For $q \in \mathbb{R}\setminus\{1\}$, the Tsallis entropy is given by
+\[
+H^{\mathrm{T}}_{q}(\widehat{\mathbf P})
+= \frac{1}{q-1}\left(1 - \sum_{\ell=1}^{k} \widehat{\mathbf p}_\ell^{\,q}\right),
+\]
+which reduces to Shannon entropy in the limit $q \to 1$.  
+A normalized version is obtained by dividing by its value under the uniform distribution.
+
+\paragraph{Rényi entropy.}
+For $q>0$, $q\neq 1$, the Rényi entropy is defined as
+\[
+H^{\mathrm{R}}_{q}(\widehat{P})
+= \frac{1}{1-q}\log\!\left(\sum_{\ell=1}^{k} \widehat{\mathbf p}_\ell^{\,q}\right),
+\]
+and is likewise normalized using its maximum value at the uniform distribution.
+
+\paragraph{Fisher Information Measure.}
+To quantify local sensitivity in the ordinal pattern distribution we adopt the discrete Fisher Information Measure proposed by Rey et.al.~\cite{Rey2024Asymptotic}:
+\[
+F(\widehat{\mathbf P})
+= 4\sum_{\ell=1}^{k-1}
+(\sqrt{(\widehat{\mathbf p}_{\ell+1})}-\sqrt{(\widehat{\mathbf p}_{\ell})})^{2}.
+\]
+%\frac{(\widehat{\mathbf p}_{\ell+1}-\widehat{\mathbf p}_{\ell})^{2}}
+%{\widehat{\mathbf p}_{\ell+1}+\widehat{\mathbf p}_{\ell}}.
+%\]
+
+This expression emphasizes differences between adjacent probabilities and therefore captures fine scale structure that entropy based measures may overlook.
+
+\subsubsection{Disequilibrium}\label{disequilibrium}
+
+All the entropies and FIM provide complementary information about the ordinal pattern distribution. However, neither descriptor quantifies the  degree to which the distribution deviates from the uniform distribution.
+To incorporate this information, we consider the concept of disequilibrium introduced by~Lopez-Ruiz et al. (1995). In the ordinal pattern setting, the natural reference is the uniform distribution \(\mathbf{u}=(1/k,1/k,\ldots,1/k)\).
+
+A widely adopted disequilibrium measure is based on the Jensen--Shannon divergence, which provides a symmetric, bounded, and information theoretically meaningful distance between \(\widehat{\mathbf{p}}\) and \(\mathbf{u}\): 
+\[
+J(\widehat{\mathbf{p}},\mathbf{u})
+= H\!\left(\frac{\widehat{\mathbf{p}}+\mathbf{u}}{2}\right)
+- \frac{1}{2}H(\widehat{\mathbf{p}})
+- \frac{1}{2}\log(k).
+\] 
+The maximum possible divergence for a Jensen-Shannon divergence is 
+\[
+J_{\max}
+= -2\left[\frac{(k+1)}{k}\log(k+1) - 2\log(2k) + \log k\right].
+\] 
+Using this, the normalized disequilibrium is defined as 
+\[
+Q(\widehat{\mathbf{p}}) = \frac{J(\widehat{\mathbf{p}},\mathbf{u})}{J_{\max}}.
+\] 
+This quantity satisfies that \(Q(\widehat{\mathbf{p}}) = 0\) for the uniform distribution (maximal disorder), and that \(Q(\widehat{\mathbf{p}}) = 1\) when all probability mass is concentrated on a single pattern (maximal deviation from equilibrium).
+
+The same Jensen--Shannon-based disequilibrium is used throughout this study for constructing Shannon, Tsallis, Rényi, and Fisher complexity measures.
+
+\subsubsection{Statistical Complexity Measures}
+\label{complexity-measures}
+
+Entropy and Fisher information quantify different aspects of the ordinal pattern distribution. Entropy measures describe the degree of uncertainty or disorder, whereas Fisher information captures local variations and sensitivity to changes in the distribution. However, these quantities
+alone do not distinguish between complete randomness and structured organization. To account for both the amount of information and the departure from the uniform distribution, we consider statistical complexity measures.
+
+Following the framework proposed Lamberti et al.~(2004)~\cite{lamberti2004intensive}, complexity is obtained as the product of an information measure and the normalized disequilibrium \(Q(\widehat{\mathbf p})\). This construction ensures that complexity is small both for highly ordered systems and for completely random systems, while attaining larger values for distributions exhibiting intermediate levels of organization.
+
+The Shannon statistical complexity is defined as
+\[
+C_S(\widehat{\mathbf p})
+=
+H(\widehat{\mathbf p})
+\,Q(\widehat{\mathbf p}),
+\]
+where \(H(\widehat{\mathbf p})\) is the normalized Shannon entropy.
+
+Similarly, the Tsallis statistical complexity is
+\[
+C_T^{(q)}(\widehat{\mathbf p})
+=
+H_T^{(q)}(\widehat{\mathbf p})
+\,Q(\widehat{\mathbf p}),
+\]
+where \(H_T^{(q)}(\widehat{\mathbf p})\) denotes the normalized Tsallis
+entropy of order \(q\).
+
+The Rényi statistical complexity is defined as
+\[
+C_R^{(q)}(\widehat{\mathbf p})
+=
+H_R^{(q)}(\widehat{\mathbf p})
+\,Q(\widehat{\mathbf p}),
+\]
+where \(H_R^{(q)}(\widehat{\mathbf p})\) denotes the normalized Rényi
+entropy of order \(q\).
+
+Finally, a Fisher-based complexity measure is obtained by combining the Fisher Information Measure with the normalized disequilibrium:
+\[
+C_F(\widehat{\mathbf p})
+=
+F(\widehat{\mathbf p})
+\,Q(\widehat{\mathbf p}).
+\]
+
+These complexity measures combine information about the uncertainty, local structure, and deviation from equilibrium of the ordinal pattern distribution, providing complementary descriptors for characterizing the underlying dynamics of the time series.
+
+
+\subsection{Feature Extraction from Seismic Time Series}\label{feature_extraction}
+
+Ordinal-pattern-based features are extracted from each time series according to the following procedure:
+
+\begin{itemize}
+	
+	\item \textbf{Embedding:}
+	A fixed embedding dimension ($D=5$) and time delay ($\tau=1$) are used to construct ordinal patterns from the seismic time series.
+	
+	\item \textbf{Temporal Aggregation:}
+	The analysis considers monthly and hourly subsets of the RSAM time series for the period 2007-2022.
+	
+	\item \textbf{Feature Extraction:}
+	For each time series, the ordinal pattern distribution is obtained and the following quantities are computed:
+	
+	\begin{itemize}
+		
+		\item \emph{Entropy Measures:}
+		Shannon entropy, R\'enyi entropy, Tsallis entropy, and Fisher information measure.
+		
+		\item \emph{Complexity Measures:}
+		The corresponding Shannon, R\'enyi, Tsallis, and Fisher complexity measures.
+		
+		\item \emph{Disequilibrium:}
+		The Jensen--Shannon disequilibrium associated with the ordinal pattern distribution.
+		
+		\item \emph{Variance Measures:}
+		Variance estimates for selected entropy and complexity measures to assess feature stability.
+		
+		\item \emph{Confidence Intervals:}
+		Confidence intervals for entropy and complexity measures are computed to quantify estimation uncertainty.
+		
+	\end{itemize}
+	
+\end{itemize}
+
+The analysis is based on the following thirteen ordinal-pattern features:
+
+\begin{itemize}
+	\item $H_{\text{Shannon}}$,
+	$H_{\text{R\'enyi}}$,
+	$H_{\text{Tsallis}}$,
+	$H_{\text{Fisher}}$,
+	
+	\item $C_{\text{Shannon}}$,
+	$C_{\text{R\'enyi}}$,
+	$C_{\text{Tsallis}}$,
+	$C_{\text{Fisher}}$,
+	
+	\item Disequilibrium,
+	
+	\item $\mathrm{Var}(H_{\text{Shannon}})$,
+	$\mathrm{Var}(H_{\text{R\'enyi}})$,
+	$\mathrm{Var}(H_{\text{Tsallis}})$,
+	
+	\item $\mathrm{Var}(C_{\text{Shannon}})$.
+\end{itemize}
+
+\subsection{Feature Space Representation}
+
+This section presents the feature representations in the $H \times C$ plane derived from ordinal pattern analysis of the RSAM time series. Four information-theoretic feature spaces are considered: Shannon entropy and statistical complexity, Tsallis entropy and statistical complexity, R\'enyi entropy and statistical complexity, and Fisher information measure and its associated statistical complexity. These representations provide a compact visualisation of the temporal characteristics of the seismic amplitude data and allow comparisons between different observation periods.
+
+Figure~\ref{fig:dec_HC_comparison} shows the annual feature representations obtained from the RSAM time series, where each point corresponds to one year between 2007 and 2021. The four panels compare the distributions of the annual feature vectors in the different $H \times C$ planes. Although inter-annual variability is evident, analysing each month independently across years does not clearly distinguish the 2019 eruption from the surrounding years.
+
+To investigate the temporal behaviour in greater detail, the analysis was refined to the monthly level for the year 2019. Figure~\ref{fig:HxC_2019} presents the corresponding feature representations in the four $H \times C$ planes, where each point represents one month of the year. A clear separation of the December point from the remaining months is observed across the feature spaces. Since the eruption occurred during December 2019, this result indicates that the ordinal pattern based information-theoretic features successfully capture the significant change in seismic behaviour associated with the eruption.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\linewidth]{\figpatha/HC_Combined_Dec_RSAM_D5_Years_2007_2021_No_CI}
+	\caption{Annual feature representations in the $H \times C$ plane for the RSAM time series using Shannon, Tsallis, Rényi, and Fisher information measure based entropy complexity pairs.}
+	\label{fig:dec_HC_comparison}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\linewidth]{\figpathb/HC_Combined_2019_RSAM_D5_Months_No_CI}
+	\caption{Monthly feature representations in the $H \times C$ plane for the RSAM time series during 2019. Each point represents one month, illustrating the separation of the December eruption month from the remaining months.}
+	\label{fig:HxC_2019}
+\end{figure}
+
+These findings demonstrate that the entropy complexity representation is sensitive to changes in volcanic activity and can distinguish the eruption month from periods of background activity. Motivated by this encouraging result obtained from the 10-minute RSAM time series, the subsequent analysis investigates whether the use of the original 1-second RSAM measurements provides an even more detailed characterisation of the temporal dynamics preceding and during the eruption.
+
+To further investigate the behaviour of the information-theoretic features around the 2019 eruption, the analysis was refined to the hourly scale. Two complementary feature-space representations are presented. The first combines all hourly ordinal pattern observations from July to December 2019, where each month is represented by a different colour in the $H \times C$ plane (Figure~\ref{fig:HxC_July-Dec2019}). The four panels correspond to the Shannon, Tsallis, Rényi, and Fisher information measure based $H \times C$ representations computed using an embedding dimension of $D=5$. This visualization enables a direct comparison of the monthly distributions and highlights the behaviour of December relative to the preceding months. As the eruption occurred in 9th December 2019, particular attention is given to this month.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\linewidth]{\figpathb/HC_ByMeasure_AllData_ColorByMonth_D5_Jul_Dec_2019_No_CI}
+	\caption{Monthly feature representations in the $H \times C$ plane for the RSAM time series during July to December in 2019. Each point represents one hour data point and separated by month.}
+	\label{fig:HxC_July-Dec2019}
+\end{figure}
+
+The Figure\ref{fig:HxC_Dec2019} focuses exclusively on the December 2019 data. This month contains approximately 240 hourly observations, corresponding to 10 sampled days with 24 hourly measurements per day. Instead of colouring the points by month, the observations are grouped according to six 4-hour time intervals (00--03, 04--07, \ldots, 20--23), allowing the temporal evolution of the entropy complexity features within the eruption month to be examined. The four $H \times C$ planes are again presented for Shannon, Tsallis, R\'enyi, and Fisher information measures, with the theoretical Shannon $H \times C$ boundary included as a reference. These complementary visualizations provide insight into both the monthly evolution leading to the eruption and the finer scale temporal variability within December itself.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\linewidth]{\figpathb/HC_ByMeasure_Dec_ColorByHour_D5_2019_No_CI}
+	\caption{Monthly feature representations in the $H \times C$ plane for the RSAM time series in December 2019. Each point represents one hour data point.}
+	\label{fig:HxC_Dec2019}
+\end{figure}
+
+The extreme entropy and complexity values for the hourly ordinal pattern analysis of the December 2019 RSAM time series were identified using a simple \texttt{R} script. Table~\ref{tab:dec_hourly_extremes} summarises the corresponding extrema obtained from the Tsallis, Rényi, and Fisher information measures.
+
+\begin{table}[H]
+	\centering
+	\caption{Extreme entropy and complexity values obtained from the hourly ordinal pattern analysis for December 2019.}
+	\label{tab:dec_hourly_extremes}
+	\begin{tabular}{llccrr}
+		\toprule
+		Measure & Extreme & Date & Hour & $H$ & $C$ \\
+		\midrule
+		Tsallis & Max $C$ & 15/12/2019 & 17.00 & 0.98500 & 0.07630 \\
+		Tsallis & Max $H$ & 09/12/2019 & 18.00 & 0.99800 & 0.00835 \\
+		Tsallis & Min $C$ & 09/12/2019 & 18.00 & 0.99800 & 0.00835 \\
+		Tsallis & Min $H$ & 15/12/2019 & 17.00 & 0.98500 & 0.07630 \\
+		\addlinespace
+		
+		R\'enyi & Max $C$ & 15/12/2019 & 17.00 & 0.94100 & 0.07300 \\
+		R\'enyi & Max $H$ & 09/12/2019 & 18.00 & 0.99300 & 0.00830 \\
+		R\'enyi & Min $C$ & 09/12/2019 & 18.00 & 0.99300 & 0.00830 \\
+		R\'enyi & Min $H$ & 15/12/2019 & 17.00 & 0.94100 & 0.07300 \\
+		\addlinespace
+		
+		Fisher & Max $C$ & 15/12/2019 & 17.00 & 0.05120 & 0.00397 \\
+		Fisher & Max $H$ & 18/12/2019 & 11.00 & 0.05220 & 0.00349 \\
+		Fisher & Min $C$ & 09/12/2019 & 18.00 & 0.00817 & 0.0000683 \\
+		Fisher & Min $H$ & 09/12/2019 & 18.00 & 0.00817 & 0.0000683 \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+Table~\ref{tab:dec_hourly_extremes} shows that the Tsallis, R\'enyi, and Fisher information measures consistently identify 9 December 2019 at 18:00~NZDT as the hour exhibiting the most pronounced information-theoretic signature in the December dataset. For the Tsallis and R\'enyi measures, this hour corresponds to the maximum entropy and minimum statistical complexity, indicating the most disordered ordinal  pattern distribution observed during the month. Similarly, the Fisher information measure identifies the same hour as having the minimum information content and minimum complexity, reflecting the lowest degree of local regularity in the seismic signal. In contrast, the opposite extrema occur several days later, with the Tsallis and R\'enyi measures identifying 15 December 2019 at 17:00~NZDT, while the Fisher measure identifies 18 December 2019 at 11:00~NZDT, corresponding to a comparatively more structured seismic regime.
+
+Verification using the original hourly dataset confirmed that the timestamps are expressed in New Zealand local time (NZDT). Consequently, the Whakaari/White Island eruption, which occurred at 14:11~NZDT on 9 December 2019, falls within the 14:00--15:00 hourly window rather than the hour containing the global extrema. This observation suggests that the strongest information-theoretic response is not confined to the exact hour of the eruption but extends into the subsequent hours, indicating that the eruption influenced the temporal characteristics of the seismic signal over an extended period.
+
+To further investigate this behaviour, the information-theoretic quantifiers were examined for the four most significant hourly windows on 9 December 2019. These windows correspond to the eruption hour and the following hours during which the entropy and complexity measures exhibit their largest changes.
+
+\sisetup{
+	round-mode = none,
+	scientific-notation = false,
+	detect-weight = true,
+	detect-family = true
+}
+
+\begin{table}[H]
+	\centering
+	\caption{Shannon and R\'enyi entropy ($H$) and statistical complexity ($C$) for the selected hourly windows on 9 December 2019.}
+	\label{tab:critical_hours_SR}
+	\small
+	\setlength{\tabcolsep}{6pt}
+	\sisetup{
+		detect-weight = true,
+		detect-family = true
+	}
+	
+	\begin{tabular}{
+			l
+			S[table-format=1.4]
+			S[table-format=1.4]
+			S[table-format=1.4]
+			S[table-format=1.4]
+		}
+		\toprule
+		&
+		\multicolumn{2}{c}{\textbf{Shannon}} &
+		\multicolumn{2}{c}{\textbf{R\'enyi}} \\
+		
+		\cmidrule(lr){2-3}
+		\cmidrule(lr){4-5}
+		
+		\textbf{Hour (NZDT)}
+		&
+		{\shortstack{$H$\\Entropy}}
+		&
+		{\shortstack{$C$\\Complexity}}
+		&
+		{\shortstack{$H$\\Entropy}}
+		&
+		{\shortstack{$C$\\Complexity}}
+		\\
+		\midrule
+		
+		14:00--15:00
+		& 0.9911
+		& 0.0162
+		& 0.9872
+		& 0.0156
+		\\
+		
+		15:00--16:00
+		& 0.9929
+		& 0.0129
+		& 0.9896
+		& 0.0124
+		\\
+		
+		17:00--18:00
+		& 0.9922
+		& 0.0140
+		& 0.9886
+		& 0.0135
+		\\
+		
+		18:00--19:00
+		& {\bfseries 0.9952}
+		& {\bfseries 0.0086}
+		& {\bfseries 0.9929}
+		& {\bfseries 0.0083}
+		\\
+		
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\begin{table}[H]
+	\centering
+	\caption{Tsallis entropy ($H$), Fisher information ($H$), and their corresponding statistical complexities ($C$) for the selected hourly windows on 9 December 2019.}
+	\label{tab:critical_hours_TF}
+	\small
+	\setlength{\tabcolsep}{6pt}
+	\sisetup{
+		detect-weight = true,
+		detect-family = true
+	}
+	
+	\begin{tabular}{
+			l
+			S[table-format=1.4]
+			S[table-format=1.4]
+			S[table-format=1.4]
+			S[table-format=1.7]
+		}
+		\toprule
+		&
+		\multicolumn{2}{c}{\textbf{Tsallis}} &
+		\multicolumn{2}{c}{\textbf{Fisher}} \\
+		
+		\cmidrule(lr){2-3}
+		\cmidrule(lr){4-5}
+		
+		\textbf{Hour (NZDT)}
+		&
+		{\shortstack{$H$\\Entropy}}
+		&
+		{\shortstack{$C$\\Complexity}}
+		&
+		{\shortstack{$H$\\Information}}
+		&
+		{\shortstack{$C$\\Complexity}}
+		\\
+		\midrule
+		
+		14:00--15:00
+		& 0.9969
+		& 0.0157
+		& 0.0124
+		& 0.0001950
+		\\
+		
+		15:00--16:00
+		& 0.9975
+		& 0.0125
+		& 0.0121
+		& 0.0001520
+		\\
+		
+		17:00--18:00
+		& 0.9972
+		& 0.0136
+		& 0.0105
+		& 0.0001440
+		\\
+		
+		18:00--19:00
+		& {\bfseries 0.9983}
+		& {\bfseries 0.0083}
+		& {\bfseries 0.0082}
+		& {\bfseries 0.0000683}
+		\\
+		
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+Although the absolute extrema occur at 18:00~NZDT, Tables~\ref{tab:critical_hours_SR} and~\ref{tab:critical_hours_TF}  demonstrates that all four information-theoretic measures consistently highlight the period between 14:00 and 18:00~NZDT. The 14:00--15:00 window, which contains the eruption at 14:11~NZDT, already exhibits entropy values close to their respective maxima and Fisher information close to its minimum. During the following hours, the Shannon, R\'enyi, and Tsallis entropy measures continue to increase, while the Fisher information measure progressively decreases, reaching its minimum at 18:00--19:00. Thus, although the global extrema identified by the four measures occur several hours after the eruption onset, visual inspection reveals that all measures consistently identify the same four-hour interval as exhibiting pronounced changes in the information-theoretic characteristics of the seismic signal. This consistent temporal evolution across four mathematically distinct information-theoretic frameworks suggests that the eruption produced a sustained modification of the ordinal-pattern structure of the seismic signal rather than an instantaneous change confined to a single hourly observation.
+
+\subsection{Time Series Clustering}
+The time series clustering is based on the following features derived from ordinal patterns.
+
+\begin{itemize}
+	\item $H_{\text{Shannon}}$,
+	$H_{\text{Rényi}}$,
+	$H_{\text{Tsallis}}$,
+	$H_{\text{Fisher}}$,
+	
+	\item $C_{\text{Shannon}}$,
+	$C_{\text{Rényi}}$,
+	$C_{\text{Tsallis}}$,
+	$C_{\text{Fisher}}$,
+	
+	\item Disequilibrium,
+	
+	\item $\mathrm{Var}(H_{\text{Shannon}})$,
+	$\mathrm{Var}(H_{\text{Rényi}})$,
+	$\mathrm{Var}(H_{\text{Tsallis}})$,
+	
+	\item $\mathrm{Var}(C_{\text{Shannon}})$.
+\end{itemize}
+
+\subsection{Cluster Evaluation}
+
+
+	
+\bibliographystyle{acm}
+\bibliography{seismic_references}
+%\bibliography{../../Ordinal_Patterns_R/Text/BearingFaultDiagnosis}
+
+\end{document}

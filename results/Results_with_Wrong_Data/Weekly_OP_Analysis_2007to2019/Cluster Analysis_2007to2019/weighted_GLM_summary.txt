@@ -1,0 +1,26 @@
+
+Call:
+glm(formula = reformulate(features, response = "y"), family = binomial(), 
+    data = data.frame(y = all_y_bin, all_x), weights = full_weights)
+
+Coefficients:
+                Estimate Std. Error z value Pr(>|z|)    
+(Intercept)       1.1757     0.4532   2.594  0.00948 ** 
+Fisher_Info      -6.0163    13.8264  -0.435  0.66347    
+C_Fisher        190.8624   137.6032   1.387  0.16543    
+Var_H_Shannon    38.8323    27.4577   1.414  0.15729    
+Var_C_Shannon     8.2186     8.0840   1.017  0.30932    
+Var_H_Tsallis  -152.9878    30.1124  -5.081 3.76e-07 ***
+Var_H_Renyi      30.6406    37.0972   0.826  0.40883    
+Disequilibrium  -44.8764    10.2637  -4.372 1.23e-05 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 1097.9  on 791  degrees of freedom
+Residual deviance: 1014.9  on 784  degrees of freedom
+AIC: 1523.6
+
+Number of Fisher Scoring iterations: 6
+

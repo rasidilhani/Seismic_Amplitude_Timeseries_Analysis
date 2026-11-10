@@ -12,6 +12,12 @@
 #   - Class-imbalance methods compared: no balancing, oversampling,
 #     undersampling, SMOTE.
 #
+# NEW: every SVM run (baseline + each feature set x balancing method) now
+# keeps its week-by-week predictions, and the script writes
+# WIZ_WSRZ_SVM_Eruption_Week_Outcomes.csv, which lists each eruption week as
+# TP or FN, each false-alarm week as FP, and the VAL eruption period it
+# belongs to.
+#
 # =============================================================================
 
 library(tidyverse)
@@ -50,7 +56,7 @@ theme_set(theme_article())
 
 DATA_DIR    <- "C:/Users/UserA1/Documents/GitHub/Seismic_Amplitude_Timeseries_Analysis/data"
 RESULTS_DIR <- "C:/Users/UserA1/Documents/GitHub/Seismic_Amplitude_Timeseries_Analysis/results"
-CLUSTER_DIR <- file.path(RESULTS_DIR, "cluster_analysis_R3")
+CLUSTER_DIR <- file.path(RESULTS_DIR, "cluster_analysis_R4")
 dir.create(CLUSTER_DIR, recursive = TRUE, showWarnings = FALSE)
 
 VAL_FILE <- file.path(DATA_DIR, "VAL_WhakaariWhiteIsland.csv")
@@ -146,6 +152,55 @@ assign_val_class <- function(week_start, week_end) {
   overlap <- val_df %>% filter(PeriodStart_UTC < week_end, PeriodEnd_UTC > week_start)
   if (nrow(overlap) == 0) return(NA_integer_)
   max(overlap$Model_Label_Num, na.rm = TRUE)
+}
+
+# =============================================================================
+# NEW - Helper: label eruption weeks as TP / FN / FP and match them to the
+# VAL eruption period they overlap
+# =============================================================================
+#
+#   TP = true eruption week, SVM predicted eruption
+#   FN = true eruption week, SVM predicted something else
+#   FP = SVM predicted eruption, but the week is not an eruption week
+#
+# VAL_Eruption_Period shows which VAL eruption period each week overlaps, so
+# you can see whether two TP weeks are two different eruptions or the same
+# eruption counted twice.
+# =============================================================================
+
+eruption_label <- model_label_levels[3]
+
+eruption_periods <- val_df %>%
+  filter(Model_Label_Num == 3L) %>%
+  select(PeriodStart_UTC, PeriodEnd_UTC, Description)
+
+match_eruption_period <- function(week_start, week_end) {
+  hit <- eruption_periods %>% filter(PeriodStart_UTC < week_end, PeriodEnd_UTC > week_start)
+  if (nrow(hit) == 0) return(NA_character_)
+  paste0(hit$Description, ": ",
+         format(hit$PeriodStart_UTC, "%Y-%m-%d %H:%M"), " to ",
+         format(hit$PeriodEnd_UTC, "%Y-%m-%d %H:%M"), " UTC",
+         collapse = "; ")
+}
+
+eruption_week_outcomes <- function(predictions) {
+  predictions %>%
+    mutate(True_Class = as.character(True_Class),
+           SVM_Prediction = as.character(SVM_Prediction)) %>%
+    filter(True_Class == eruption_label | SVM_Prediction == eruption_label) %>%
+    mutate(
+      Outcome = case_when(
+        True_Class == eruption_label & SVM_Prediction == eruption_label ~ "TP",
+        True_Class == eruption_label ~ "FN",
+        TRUE ~ "FP"
+      ),
+      VAL_Eruption_Period = purrr::map2_chr(Week_Start, Week_End, match_eruption_period),
+      Week_Start_NZ = format(lubridate::with_tz(Week_Start, "Pacific/Auckland"), "%Y-%m-%d %H:%M %Z"),
+      Week_End_NZ   = format(lubridate::with_tz(Week_End,   "Pacific/Auckland"), "%Y-%m-%d %H:%M %Z")
+    ) %>%
+    select(Station, Feature_Set, Balance_Method, Outcome,
+           Week_Start, Week_End, Week_Start_NZ, Week_End_NZ,
+           True_Class, SVM_Prediction, VAL_Eruption_Period)
 }
 
 # =============================================================================
@@ -426,12 +481,17 @@ run_svm_cv <- function(X, y, balance = "No_Balancing") {
 # =============================================================================
 # Helper: SVM across feature sets and balancing methods
 # =============================================================================
+#
+# NEW: also keeps each run's week-by-week predictions (returned as
+# $predictions), so TP / FN / FP weeks can be traced for every setting.
+# =============================================================================
 
 compare_svm_across_settings <- function(data, station_name) {
   
   cat("\n---- SVM across feature sets and balancing methods ----\n")
   
   results <- tibble()
+  predictions <- tibble()
   
   for (set_name in names(feature_sets)) {
     
@@ -443,6 +503,13 @@ compare_svm_across_settings <- function(data, station_name) {
       cat("  Feature set:", set_name, " | Balance method:", method, "\n")
       
       svm_res <- run_svm_cv(X_set, data$Model_Label, balance = method)
+      
+      predictions <- bind_rows(predictions, tibble(
+        Station = station_name, Feature_Set = set_name, Balance_Method = method,
+        Week_Start = data$Week_Start, Week_End = data$Week_End,
+        True_Class = as.character(data$Model_Label),
+        SVM_Prediction = as.character(svm_res$prediction)
+      ))
       
       row <- tibble(Station = station_name, Feature_Set = set_name, Balance_Method = method,
                     Accuracy = svm_res$accuracy, Balanced_Accuracy = svm_res$balanced_accuracy)
@@ -473,7 +540,7 @@ compare_svm_across_settings <- function(data, station_name) {
   plot_path <- file.path(CLUSTER_DIR, paste0(station_name, "_SVM_FeatureSet_Balance_Plot.pdf"))
   ggsave(plot_path, svm_plot, width = 9, height = 9)
   
-  list(results = results, plot_path = plot_path)
+  list(results = results, predictions = predictions, plot_path = plot_path)
 }
 
 # =============================================================================
@@ -714,6 +781,25 @@ weekly_results <- bind_rows(
   select(Station, Week_Start, Week_End, Model_Label, Kmeans_Cluster, DBSCAN_Cluster, SVM_Prediction, all_of(all_features))
 write_csv(weekly_results, file.path(CLUSTER_DIR, "WIZ_WSRZ_Weekly_Results.csv"))
 
+# 7. NEW - every eruption week (TP / FN) and false-alarm week (FP), for the
+#    SVM baseline and every feature set x balancing combination, with the
+#    VAL eruption period each week overlaps
+baseline_outcomes <- weekly_results %>%
+  transmute(Station, Feature_Set = "7_Features", Balance_Method = "Baseline",
+            Week_Start, Week_End, True_Class = Model_Label, SVM_Prediction) %>%
+  eruption_week_outcomes()
+
+comparison_outcomes <- bind_rows(
+  WIZ_result$svm_comparison$predictions,
+  WSRZ_result$svm_comparison$predictions
+) %>%
+  eruption_week_outcomes()
+
+eruption_outcomes <- bind_rows(baseline_outcomes, comparison_outcomes) %>%
+  arrange(Station, Feature_Set, Balance_Method, Outcome, Week_Start)
+
+write_csv(eruption_outcomes, file.path(CLUSTER_DIR, "WIZ_WSRZ_SVM_Eruption_Week_Outcomes.csv"))
+
 cat("\nResult files written to:", CLUSTER_DIR, "\n")
 cat(" - WIZ_WSRZ_True_Class_Distribution.csv\n")
 cat(" - WIZ_WSRZ_Model_Summary.csv\n")
@@ -721,6 +807,7 @@ cat(" - WIZ_WSRZ_Confusion_Tables_Combined.csv\n")
 cat(" - WIZ_WSRZ_SVM_FeatureSet_Balance_Comparison.csv   <- sort by Eruption_Correct / Eruption_Recall\n")
 cat(" - WIZ_WSRZ_Clustering_FeatureSet_Comparison.csv\n")
 cat(" - WIZ_WSRZ_Weekly_Results.csv\n")
+cat(" - WIZ_WSRZ_SVM_Eruption_Week_Outcomes.csv   <- TP / FN / FP weeks with their VAL eruption period\n")
 cat("\nPlots (each its own PDF, per station):\n")
 cat(" - <station>_13_Feature_Correlogram.pdf\n")
 cat(" - <station>_Kmeans_Cluster_Plot.pdf\n")

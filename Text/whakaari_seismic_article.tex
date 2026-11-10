@@ -1,0 +1,280 @@
+\documentclass[journal]{IEEEtran}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{cite}
+\usepackage{hyperref}
+\usepackage{geometry}
+
+\geometry{margin=0.75in}
+
+\title{Ordinal-Pattern Cluster Analysis of RSAM Time Series for Detecting Volcanic Seismic Anomalies at Whakaari, 2014--2019}
+
+\author{Rasika~Dilhani, Alejandro~C.~Frery, Andrea~Rey, and~Finnigan~Illsley-Kemp
+\thanks{R. Dilhani and A. C. Frery are with the School of Mathematics and Statistics, Victoria University of Wellington, Wellington 6140, New Zealand.}
+\thanks{A. Rey is with the Lab. de Invest. y Desarr. Exp. en Computación, Universidad Nacional de Hurlingham (UNAHUR), Argentina.}
+\thanks{F. Illsley-Kemp is with the School of Geography, Environment and Earth Sciences, Victoria University of Wellington, Wellington, New Zealand.}
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Continuous Real-time Seismic Amplitude Measurement (RSAM) provides vital insight into active volcanic systems, yet identifying subtle state transitions requires methods sensitive to non-linear dynamics beyond raw amplitude fluctuations. This study presents a multi-station anomaly detection framework based on ordinal-pattern feature extraction and cluster analysis applied to RSAM time series recorded at Whakaari (White Island), New Zealand. The analysis spans 1 July 2014 to late December 2019 and uses two GeoNet stations, WIZ and WSRZ. Weekly ordinal-pattern features ($D=5, \tau=1$) are compared with GeoNet Volcanic Alert Level (VAL) System Version 3 labels grouped into background unrest, moderate to heightened unrest, and minor to moderate eruption. A seven-feature representation is evaluated using DBSCAN, weighted radial-basis SVM, and weighted multinomial logistic regression. The data are strongly imbalanced, with only four eruption-labelled weekly windows at each station. DBSCAN identified many anomalous weeks not labelled as eruptions by VAL, while supervised models showed limited but improved three-class discrimination, especially for WSRZ. The results suggest that ordinal-pattern features are useful for identifying candidate anomalous seismic weeks, but eruption-week recognition remains constrained by class imbalance and feature redundancy.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Whakaari, volcanic seismicity, RSAM, ordinal patterns, permutation entropy, statistical complexity, DBSCAN, SVM, multinomial logistic regression, anomaly detection, WIZ, WSRZ.
+\end{IEEEkeywords}
+
+\section{Introduction}
+Volcanic eruptions represent severe geohazards with profound implications for local communities, infrastructure, aviation, and environmental safety. Effective volcanic monitoring relies heavily on continuous seismic recording to track subsurface mass transport, fluid movement, and pressurization within volcanic conduits. Among standard monitoring metrics, Real-time Seismic Amplitude Measurement (RSAM) serves as a computationally efficient summary of seismic signal energy, widely used to track volcanic unrest \cite{endo1991real}.
+
+While RSAM amplitude trends provide operational alerts, traditional amplitude-based thresholds often fail to capture complex, non-linear structural changes in continuous seismic signals prior to eruptive events. Information-theoretic approaches offer a powerful complementary paradigm by quantifying the temporal organization and deterministic structure of time series rather than relying solely on overall magnitude. In particular, ordinal pattern dynamics—which evaluate the relative temporal ordering of consecutive observations—provide robust, noise-resistant representations of non-linear systems \cite{bandt2002permutation}.
+
+Recent studies have expanded the use of ordinal patterns and entropy-complexity metrics across various volcanic and hydrothermal settings \cite{telesca2014using, rey2023tracking, sudibyo2022eruption}. However, long-term multi-station comparisons and systematic feature selection frameworks remain limited. 
+
+In this work, we present an extended multi-year (1 July 2014--late December 2019) anomaly detection study at Whakaari (White Island), New Zealand, using data from two key seismic stations: WIZ and WSRZ. We extract ordinal-pattern descriptors from weekly RSAM windows and evaluate seven features against GeoNet VAL System Version 3 labels. The aim is twofold: first, to assess whether ordinal-pattern features can identify known eruption-labelled weeks, and second, to identify anomalous weeks that are not labelled as eruptions by the official VAL record.
+
+\section{Literature Review}
+\subsection{Information-Theoretic Measures in Volcanic Seismology}
+Information-theoretic methods evaluate the disorder and complexity of continuous physical processes. In volcanic monitoring, early applications established that changes in seismic signal order often precede major physical shifts in eruptive conduits. Telesca et al. \cite{telesca2014using} applied the Fisher--Shannon method to continuous seismic data recorded during the 2011--2012 El Hierro eruption (Canary Islands), demonstrating that information measure trajectories effectively distinguish background tremor from pre-eruptive magma movement. Similarly, Rey-Devesa et al. \cite{rey2023tracking} tracked volcanic explosions at Volcán de Colima using normalized Shannon entropy, finding significant drops in entropy corresponding to highly deterministic pre-explosive activity.
+
+\subsection{Ordinal Patterns and Permutation Entropy}
+Introduced by Bandt and Pompe \cite{bandt2002permutation}, permutation entropy transforms a continuous time series into symbolic ordinal patterns based on relative orderings within embedding windows. This approach naturally handles non-stationary signals and observational noise without demanding strict parametric distributional assumptions.
+
+Expanding upon permutation entropy, statistical complexity measures \cite{lamberti2004intensive} incorporate both entropy (randomness) and disequilibrium (distance from uniform distribution). In volcanic contexts, Dilhani et al. \cite{dilhani2023multiscale} established that entropy-complexity planes ($H \times C$) capture structural changes in RSAM dynamics prior to the 9 December 2019 Whakaari eruption, with weekly windows ($D=5$) revealing precursory excursions away from background clusters.
+
+\subsection{Forecasting State Transitions: Geysers and Volcanic Conduits}
+A crucial recent contribution to ordinal pattern dynamics in hydrothermal and volcanic forecasting is the study by Sudibyo et al. \cite{sudibyo2022eruption}. Investigating the Strokkur Geyser in Iceland, Sudibyo et al. utilized permutation entropy (PE) on high-frequency seismic and tilt records to identify premonitory pattern shifts preceding eruptive dynamics. Their work highlighted two vital insights:
+\begin{enumerate}
+    \item Permutation entropy detects subtle shifts in physical system states prior to visual or amplitude-based eruption signatures.
+    \item Ordinal feature trajectories exhibit distinct clustering behavior corresponding to specific physical regimes (e.g., conduit pressurization, bubble nucleation, and discharge).
+\end{enumerate}
+The findings of Sudibyo et al. \cite{sudibyo2022eruption} provide compelling theoretical and empirical support for extending permutation entropy features into multi-station, multi-year anomaly detection frameworks on active volcanoes such as Whakaari.
+
+\subsection{Multi-Station Feature Selection and Clustering Gap}
+While previous works demonstrate the efficacy of single entropy measures or short temporal windows, long-term continuous volcanic time series suffer from high dimensionality and environmental noise. Extracting multiple ordinal features (e.g., Shannon, Rényi, and Tsallis entropies alongside Fisher Information and statistical complexity) produces high-dimensional feature spaces. Selecting a compact, highly informative subset of features is essential for robust unsupervised clustering and automated anomaly detection across multiple seismic stations (e.g., WIZ and WSRZ over 2014--2019).
+
+\section{Study Area and Dataset}
+\subsection{Whakaari Volcanic System}
+Whakaari (White Island) is an active stratovolcano situated offshore in the Bay of Plenty, New Zealand. The island represents the emergent summit of a larger submarine structure, characterized by frequent hydrothermal activity, phreatic explosions, and magmatic eruptions, including the fatal event on 9 December 2019.
+
+\subsection{Seismic Stations: WIZ and WSRZ}
+Continuous monitoring of Whakaari is maintained via the GeoNet seismic network. This study utilizes RSAM time series from two primary monitoring stations:
+\begin{itemize}
+    \item \textbf{WIZ}: Located on the main island, capturing near-field hydrothermal and magmatic tremor dynamics.
+    \item \textbf{WSRZ}: Situated on the crater wall/rim, providing complementary directional and structural seismic coverage.
+\end{itemize}
+
+\subsection{RSAM Data Preprocessing and Time Series Windowing}
+Seismic signals originally sampled at $100~\text{Hz}$ are processed into non-overlapping $10\text{-minute}$ averaged RSAM values. Over the extended 5.5-year observation period from 1 July 2014 to 31 December 2019:
+\begin{itemize}
+    \item Weekly observations: $N_{\text{week}} = 7 \times 144 = 1008$ data points per 7-day window.
+\end{itemize}
+Weekly time series analysis is conducted using overlapping 7-day sliding windows with a 1-day step size, ensuring continuous trajectory tracking in feature space across both WIZ and WSRZ datasets.
+
+\section{Methodology}
+
+\subsection{Ordinal Pattern Feature Extraction}
+Given a time series $X = \{x_t\}_{t=1}^N$, an embedding vector of dimension $D$ and delay $\tau$ is defined as:
+\begin{equation}
+\mathbf{x}_t = (x_t, x_{t+\tau}, \dots, x_{t+(D-1)\tau}).
+\end{equation}
+The components of $\mathbf{x}_t$ are mapped to a unique permutation pattern $\pi_i \in S_D$, where $S_D$ is the symmetric group of $D!$ possible ordinal permutations. For weekly windows ($D=5, \tau=1$), $D! = 120$ possible patterns exist. The empirical probability of pattern $\pi_i$ is given by:
+\begin{equation}
+p_i = \frac{n_i}{N - (D-1)\tau},
+\end{equation}
+yielding the probability distribution $P = (p_1, p_2, \dots, p_{D!})$.
+
+From $P$, an initial suite of \textbf{13 ordinal-pattern features} is extracted:
+\begin{enumerate}
+    \item Normalized Shannon Entropy ($H_S$)
+    \item Rényi Entropy ($H_R^{(q)}$ for $q=0.5, 2.0$)
+    \item Tsallis Entropy ($H_T^{(q)}$ for $q=0.5, 2.0$)
+    \item Discrete Fisher Information Measure ($F$)
+    \item Jensen--Shannon Statistical Complexity ($C_S$)
+    \item Rényi Statistical Complexity ($C_R$)
+    \item Tsallis Statistical Complexity ($C_T$)
+    \item Fisher-based Complexity ($C_F$)
+    \item Ordinal Pattern Disequilibrium ($Q_J$)
+    \item Permutation Pattern Variance ($\sigma_{\pi}^2$)
+    \item Max-Pattern Probability Ratio ($p_{\max} / p_{\text{uniform}}$)
+    \item Missing Pattern Ratio ($\mu_{\text{missing}}$)
+    \item Temporal Pattern Transition Entropy ($H_{\Delta \pi}$)
+\end{enumerate}
+
+\subsection{Feature Selection (13 to 7 Features)}
+To reduce the original ordinal-pattern feature space while preserving structural sensitivity, seven features were retained for the cluster and classification experiments:
+\begin{enumerate}
+    \item Fisher information,
+    \item Fisher-based complexity,
+    \item variance of Shannon entropy,
+    \item variance of Shannon complexity,
+    \item variance of Tsallis entropy,
+    \item variance of Rényi entropy,
+    \item ordinal-pattern disequilibrium.
+\end{enumerate}
+Correlation analysis was then used to diagnose redundancy within this seven-feature set. Highly correlated feature pairs are reported in Section~\ref{sec:cluster_results}.
+
+\subsection{Cluster Analysis and Classification Framework}
+The seven selected features form a standardized feature vector $\mathbf{z}_w \in \mathbb{R}^7$ for each weekly window $w$. GeoNet VAL System Version 3 records were mapped to three modelling labels: class 1 for background unrest, class 2 for moderate to heightened unrest, and class 3 for minor to moderate eruption. When multiple VAL states overlapped a weekly window, the highest activity class was assigned to that window.
+
+DBSCAN was used as an unsupervised anomaly detector, with DBSCAN noise points interpreted as anomalous weekly windows. These anomalies were compared with the VAL-derived three-class labels. In addition, weighted radial-basis support vector machines (SVMs) and weighted multinomial logistic regression were evaluated using repeated stratified cross-validation. Because the eruption class contained only four weekly windows per station, the number of folds was reduced from five to four.
+\begin{itemize}
+    \item \textbf{Background Cluster}: Represents baseline seismic state (high entropy, low statistical complexity, uniform pattern distribution).
+    \item \textbf{Anomalous/Precursory Cluster}: Represents coherent, deterministic seismic dynamics prior to eruption (low entropy, elevated complexity, high Fisher information, increased missing pattern ratio).
+\end{itemize}
+
+\section{Results: Time Series and Weekly Analysis}
+\subsection{Long-Term Time Series Trends (2014--2019)}
+The 5.5-year RSAM series for WIZ and WSRZ reveals distinct multi-annual baseline shifts punctuated by sharp unrest phases. While raw RSAM amplitudes experience elevated background noise from weather and hydrothermal bubbling, the weekly ordinal feature trajectories isolate physical signal alterations.
+
+\subsection{VAL Label Distribution}
+The weekly modelling labels were highly imbalanced for both stations (Table~\ref{tab:label_counts}). Background unrest dominated the record, while eruption-labelled windows were rare. This imbalance is important when interpreting model accuracy, because high overall accuracy can be obtained even when eruption weeks are missed.
+
+\begin{table}[!t]
+\centering
+\caption{Weekly VAL System Version 3 label counts used for modelling.}
+\label{tab:label_counts}
+\begin{tabular}{lrrr}
+\toprule
+Station & Class 1 & Class 2 & Class 3 \\
+\midrule
+WIZ  & 320 & 11 & 4 \\
+WSRZ & 318 & 11 & 4 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Feature Correlation}
+\label{sec:cluster_results}
+Several retained features remained strongly correlated (Table~\ref{tab:feature_corr}). The Fisher-information group was especially redundant, with Fisher information, Fisher-based complexity, and disequilibrium showing correlations above 0.92 for WIZ or WSRZ. Variance-based entropy features also showed high correlations, particularly between Shannon and Tsallis entropy variance.
+
+\begin{table*}[!t]
+\centering
+\caption{Highly correlated feature pairs, using $|\rho| \geq 0.90$.}
+\label{tab:feature_corr}
+\begin{tabular}{llcc}
+\toprule
+Station & Feature pair & Correlation & Absolute correlation \\
+\midrule
+WIZ  & Fisher information -- Fisher-based complexity & 0.968 & 0.968 \\
+WIZ  & Fisher-based complexity -- disequilibrium & 0.966 & 0.966 \\
+WIZ  & Shannon entropy variance -- Tsallis entropy variance & 0.927 & 0.927 \\
+WIZ  & Fisher information -- disequilibrium & 0.926 & 0.926 \\
+WIZ  & Shannon entropy variance -- Shannon complexity variance & 0.924 & 0.924 \\
+WSRZ & Fisher-based complexity -- disequilibrium & 0.950 & 0.950 \\
+WSRZ & Fisher information -- Fisher-based complexity & 0.941 & 0.941 \\
+WSRZ & Shannon entropy variance -- Tsallis entropy variance & 0.935 & 0.935 \\
+WSRZ & Shannon entropy variance -- Shannon complexity variance & 0.925 & 0.925 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\subsection{DBSCAN Anomaly Results}
+DBSCAN identified 42 anomalous weekly windows for WIZ and 46 for WSRZ (Table~\ref{tab:dbscan}). Most DBSCAN anomalies occurred during class 1 background unrest. At WIZ, one of four eruption-labelled windows was detected as anomalous; at WSRZ, no eruption-labelled window was detected as anomalous. Therefore, DBSCAN should not be interpreted as a reliable eruption-week classifier in its current configuration. Its main value is the identification of candidate anomalous weeks not recorded as eruption periods by VAL: 41 weeks for WIZ and 46 weeks for WSRZ.
+
+\begin{table*}[!t]
+\centering
+\caption{DBSCAN anomaly status compared with three-class VAL labels.}
+\label{tab:dbscan}
+\begin{tabular}{llrr}
+\toprule
+Station & VAL model label & Anomaly & Clustered \\
+\midrule
+WIZ  & Class 1: background unrest & 40 & 280 \\
+WIZ  & Class 2: moderate to heightened unrest & 1 & 10 \\
+WIZ  & Class 3: minor to moderate eruption & 1 & 3 \\
+WSRZ & Class 1: background unrest & 44 & 274 \\
+WSRZ & Class 2: moderate to heightened unrest & 2 & 9 \\
+WSRZ & Class 3: minor to moderate eruption & 0 & 4 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\subsection{Supervised Classification Results}
+The weighted RBF SVM produced the best repeated cross-validation performance among the supervised models (Table~\ref{tab:model_comparison}). For WIZ, the selected SVM used cost $=1$ and $\gamma=0.10$, with mean balanced accuracy of 0.564. For WSRZ, the selected SVM used cost $=1$ and $\gamma=0.05$, with mean balanced accuracy of 0.639. The WSRZ SVM also detected two of four eruption-labelled weekly windows in the out-of-fold confusion matrix. Weighted multinomial logistic regression was weaker for WIZ but competitive for WSRZ.
+
+\begin{table*}[!t]
+\centering
+\caption{Model comparison from the R cluster-analysis output. DBSCAN is evaluated as class 3 eruption versus class 1/2 non-eruption; SVM and multinomial logistic regression are evaluated on the three-class VAL label.}
+\label{tab:model_comparison}
+\begin{tabular}{llrrrr}
+\toprule
+Station & Model & Accuracy & Kappa & Mean balanced accuracy & Mean F1 \\
+\midrule
+WIZ  & DBSCAN anomaly flag & 0.869 & 0.022 & 0.563 & 0.043 \\
+WIZ  & Weighted RBF SVM & 0.644 & 0.043 & 0.564 & 0.296 \\
+WIZ  & Weighted multinomial logistic regression & 0.515 & 0.007 & 0.502 & 0.253 \\
+WSRZ & DBSCAN anomaly flag & 0.850 & -0.023 & 0.430 & 0.000 \\
+WSRZ & Weighted RBF SVM & 0.613 & 0.050 & 0.639 & 0.322 \\
+WSRZ & Weighted multinomial logistic regression & 0.595 & 0.031 & 0.605 & 0.305 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+The out-of-fold SVM confusion matrices are shown in Table~\ref{tab:svm_confusion}. For WIZ, the classifier correctly identified 214 background-unrest weeks and 6 moderate-to-heightened unrest weeks, but none of the four eruption-labelled weeks were predicted as class 3. Three eruption-labelled weeks were predicted as background unrest and one was predicted as moderate-to-heightened unrest. For WSRZ, the classifier correctly identified 205 background-unrest weeks, 6 moderate-to-heightened unrest weeks, and 2 of the 4 eruption-labelled weeks. These results indicate that the WSRZ feature space preserved stronger eruption-class information than WIZ under the present feature set and SVM parameterization.
+
+\begin{table*}[!t]
+\centering
+\caption{Out-of-fold weighted RBF SVM confusion matrices. Rows are predicted classes and columns are VAL-derived reference classes.}
+\label{tab:svm_confusion}
+\begin{tabular}{llrrr}
+\toprule
+Station & Predicted class & Reference class 1 & Reference class 2 & Reference class 3 \\
+\midrule
+WIZ  & Class 1: background unrest & 214 & 3 & 3 \\
+WIZ  & Class 2: moderate to heightened unrest & 85 & 6 & 1 \\
+WIZ  & Class 3: minor to moderate eruption & 21 & 2 & 0 \\
+\midrule
+WSRZ & Class 1: background unrest & 205 & 5 & 2 \\
+WSRZ & Class 2: moderate to heightened unrest & 81 & 6 & 0 \\
+WSRZ & Class 3: minor to moderate eruption & 32 & 0 & 2 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\section{Discussion}
+The integration of a 5.5-year dataset spanning 2014 to 2019 across two independent seismic stations strengthens the statistical foundation of volcanic anomaly detection at Whakaari. However, the VAL-labelled modelling problem is severely imbalanced, with only four eruption-labelled weekly windows per station. This class imbalance limits the reliability of ordinary accuracy and motivates the use of balanced accuracy, class-wise sensitivity, and careful inspection of confusion matrices.
+
+The correlation analysis shows that the seven-feature set is still partially redundant. In particular, Fisher information, Fisher-based complexity, and disequilibrium carry closely related information, while the variance of Shannon entropy is strongly correlated with the variance of Tsallis entropy. Removing one or two highly correlated features may improve DBSCAN distance geometry and reduce over-weighting of a single dynamical property.
+
+DBSCAN successfully identified anomalous weeks, but these anomalies did not consistently correspond to known eruption-labelled weeks. This is not necessarily a failure of the method: many DBSCAN anomalies occurred outside class 3 eruption windows and may represent unrest or unlabelled anomalous behaviour. These weeks are scientifically useful candidates for follow-up comparison with independent observations, gas measurements, crater-lake changes, or operational monitoring notes.
+
+The supervised models provide a more direct test of the VAL labels. The SVM results were strongest for WSRZ, where the out-of-fold confusion matrix detected two of the four eruption-labelled windows. In contrast, WIZ supervised results did not reliably identify class 3 eruption weeks. These station differences suggest that the WSRZ feature trajectories may contain stronger discriminative information for the eruption-labelled periods, or that WIZ requires additional feature tuning and station-specific parameter selection.
+
+As emphasized by Sudibyo et al. \cite{sudibyo2022eruption} in their study of Strokkur Geyser, permutation pattern dynamics reflect fundamental physical shifts in subsurface fluid flow and conduit resonance. The Whakaari results show that ordinal-pattern feature selection combined with clustering can highlight candidate anomalous seismic weeks, but the detection of confirmed eruption-labelled weeks remains station dependent and should be evaluated with additional monitoring evidence.
+
+\section{Conclusion}
+This study expanded the ordinal-pattern entropy-complexity methodology to a 5.5-year multi-station dataset (2014--2019, WIZ and WSRZ) at Whakaari. Seven ordinal-pattern features were evaluated against VAL System Version 3 labels using DBSCAN, weighted RBF SVM, and weighted multinomial logistic regression. DBSCAN highlighted many candidate anomalous weeks not recorded as eruption periods, while supervised models showed that WSRZ provided stronger three-class discrimination than WIZ. The results support ordinal-pattern analysis as a useful component of volcano seismic monitoring, but they also show that eruption-week recognition is limited by rare class-3 examples and correlated features. Future work should evaluate reduced feature sets, station-specific DBSCAN parameters, and additional monitoring data to determine whether the unrecorded DBSCAN anomalies correspond to physically meaningful volcanic unrest.
+
+\begin{thebibliography}{99}
+
+\bibitem{endo1991real}
+E.~Endo and T.~Murray, ``Real-time seismic amplitude measurement (RSAM): A volcano monitoring and prediction tool,'' \emph{Bulletin of Volcanology}, vol.~53, no.~7, pp. 533--545, 1991.
+
+\bibitem{bandt2002permutation}
+C.~Bandt and B.~Pompe, ``Permutation entropy: A natural complexity measure for time series,'' \emph{Physical Review Letters}, vol.~88, no.~17, p. 174102, 2002.
+
+\bibitem{telesca2014using}
+L.~Telesca, M.~Lovallo, J.~M. Molist, C.~L. Moreno, and R.~A. Mel{\'e}ndez, ``Using the Fisher--Shannon method to characterize continuous seismic signal during volcanic eruptions: Application to the 2011--2012 El Hierro (Canary Islands) eruption,'' \emph{Terra Nova}, vol.~26, no.~6, pp. 425--429, 2014.
+
+\bibitem{rey2023tracking}
+P.~Rey-Devesa, J.~Prudencio, C.~Ben{\'\i}tez, M.~Bret{\'o}n, I.~Plasencia, Z.~Le{\'o}n, F.~Ortigosa, L.~Guti{\'e}rrez, R.~Ar{\'a}mbula-Mendoza, and J.~Ib{\'a}{\~n}ez, ``Tracking volcanic explosions using Shannon entropy at Volc{\'a}n de Colima,'' \emph{Scientific Reports}, vol.~13, no.~1, p. 9807, 2023.
+
+\bibitem{sudibyo2022eruption}
+U.~Sudibyo, A.~C. Frery, and F.~Illsley-Kemp, ``Eruption forecasting of Strokkur Geyser, Iceland, using permutation entropy,'' \emph{Journal of Geophysical Research: Solid Earth}, vol.~127, no.~8, e2022JB024840, 2022.
+
+\bibitem{dilhani2023multiscale}
+R.~Dilhani, A.~C. Frery, A.~Rey, and F.~Illsley-Kemp, ``Multi-scale ordinal-pattern entropy--complexity analysis of volcanic seismic activity: A case study of the 2019 Whakaari eruption,'' \emph{IEEE Transactions on Geoscience and Remote Sensing}, 2023.
+
+\bibitem{lamberti2004intensive}
+P.~W. Lamberti, M.~T. Martin, A.~Plastino, and O.~A. Rosso, ``Intensive statistical complexity measures,'' \emph{Physica A: Statistical Mechanics and its Applications}, vol.~334, no.~1-2, pp. 119--131, 2004.
+
+\end{thebibliography}
+
+\end{document}
